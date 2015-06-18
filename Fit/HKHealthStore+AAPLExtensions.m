@@ -9,6 +9,7 @@
 */
 
 #import "HKHealthStore+AAPLExtensions.h"
+#import "AAPLProfileViewController.h"
 
 @implementation HKHealthStore (AAPLExtensions)
 
@@ -37,71 +38,45 @@
 }
 
 
-//- (void)collectStatisticsQuery {
-//    NSCalendar *calendar = [NSCalendar currentCalendar];
-//    NSDateComponents *interval = [[NSDateComponents alloc] init];
-//    interval.day = 7;
-//    
-//    // Set the anchor date to Monday at 3:00 a.m.
-//    NSDateComponents *anchorComponents =
-//    [calendar components:NSCalendarUnitDay | NSCalendarUnitMonth |
-//     NSCalendarUnitYear | NSCalendarUnitWeekday fromDate:[NSDate date]];
-//    
-//    NSInteger offset = (7 + anchorComponents.weekday - 2) % 7;
-//    anchorComponents.day -= offset;
-//    anchorComponents.hour = 3;
-//    
-//    NSDate *anchorDate = [calendar dateFromComponents:anchorComponents];
-//    
-//    HKQuantityType *quantityType =
-//    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
-//    
-//    // Create the query
-//    HKStatisticsCollectionQuery *query =
-//    [[HKStatisticsCollectionQuery alloc]
-//     initWithQuantityType:quantityType
-//     quantitySamplePredicate:nil
-//     options:HKStatisticsOptionCumulativeSum
-//     anchorDate:anchorDate
-//     intervalComponents:interval];
-//    
-//    // Set the results handler
-//    query.initialResultsHandler =
-//    ^(HKStatisticsCollectionQuery *query, HKStatisticsCollection *results, NSError *error) {
-//        
-//        if (error) {
-//            // Perform proper error handling here
-//            NSLog(@"*** An error occurred while calculating the statistics: %@ ***",
-//                  error.localizedDescription);
-//            abort();
-//        }
-//        
-//        NSDate *endDate = [NSDate date];
-//        NSDate *startDate = [calendar
-//                             dateByAddingUnit:NSCalendarUnitMonth
-//                             value:-3
-//                             toDate:endDate
-//                             options:0];
-//        
-//        // Plot the weekly step counts over the past 3 months
-//        [results
-//         enumerateStatisticsFromDate:startDate
-//         toDate:endDate
-//         withBlock:^(HKStatistics *result, BOOL *stop) {
-//             
-//             HKQuantity *quantity = result.sumQuantity;
-//             if (quantity) {
-//                 NSDate *date = result.startDate;
-//                 double value = [quantity doubleValueForUnit:[HKUnit countUnit]];
-//                 
-//                 [self plotData:value forDate:date];
-//             }
-//             
-//         }];
-//    };
-//    
-//    [self executeQuery:query];
-//}
+- (void)hkQueryExecute:(void (^)(double, NSError *))completion {
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    
+    NSDate *now = [NSDate date];
+    
+    NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:now];
+    
+    NSDate *startDate = [calendar dateFromComponents:components];
+    
+    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:startDate options:0];
+    
+    HKSampleType *sampleType = [HKSampleType categoryTypeForIdentifier:HKCategoryTypeIdentifierSleepAnalysis];
+    NSPredicate *predicate = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionNone];
+    
+    HKSampleQuery *query = [[HKSampleQuery alloc] initWithSampleType:sampleType predicate:predicate limit:0 sortDescriptors:nil resultsHandler:^(HKSampleQuery *query, NSArray *results, NSError *error) {
+        if (!results) {
+            NSLog(@"An error occured fetching the user's sleep duration. In your app, try to handle this gracefully. The error was: %@.", error);
+            completion(0, error);
+            abort();
+        }
+        
+        double minutesAggr = 0;
+        for (HKCategorySample *sample in results) {
+
+            NSTimeInterval distanceBetweenDates = [sample.endDate timeIntervalSinceDate:sample.startDate];
+            double minutesInAnHour = 60;
+            double minutesBetweenDates = distanceBetweenDates / minutesInAnHour;
+            minutesAggr += minutesBetweenDates;
+            
+        }
+        completion(minutesAggr, error);
+    }];
+    
+    [self executeQuery:query];
+}
+
+
+
+
 
 
 

@@ -29,7 +29,7 @@ NSString *const AAPLJournalViewControllerTableViewCellReuseIdentifier = @"cell";
 
     self.foodItems = [NSMutableArray array];
 
-    [self updateJournal];
+    //[self updateJournal];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateJournal) name:UIApplicationDidBecomeActiveNotification object:nil];
 }

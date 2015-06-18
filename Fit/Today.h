@@ -15,13 +15,27 @@
 
 @property (strong, nonatomic, readwrite) CDTDataObjectMetadata *metadata;
 
-@property NSInteger id;
+@property NSDate* date;
 @property NSInteger steps;
 @property NSInteger caloriesBurned;
-@property NSInteger caloriesEaten;
-@property double sleepHours;
+@property NSInteger heartRate;
+@property NSInteger sleepMinutes;
+@property NSInteger height;  //cm
+@property NSInteger  weight;  //kg
+@property NSInteger  age;    //years
+
+
 //@property Person *owner;
 
--(instancetype) initWithId: (NSInteger) id steps: (NSInteger) steps caloriesBurned: (NSInteger) caloriesBurned caloriesEaten: (NSInteger) caloriesEaten sleepHours:(double) sleepHours;
+-(instancetype) initWithDate:(NSDate*) date
+                        steps:(NSInteger)steps
+               caloriesBurned:(NSInteger)caloriesBurned
+                    heartRate:(NSInteger)heartRate
+                   sleepMinutes:(NSInteger)sleepMinutes
+                       height:(NSInteger)height
+                       weight:(NSInteger)weight
+                         age:(NSInteger)age;
+
+
 
 @end

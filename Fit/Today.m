@@ -10,14 +10,27 @@
 
 @implementation Today
 
--(instancetype) initWithId: (NSInteger) idid steps: (NSInteger) steps caloriesBurned: (NSInteger) caloriesBurned caloriesEaten: (NSInteger) caloriesEaten sleepHours:(double) sleepHours
+-(instancetype) initWithDate: (NSDate*) date
+                        steps: (NSInteger) steps
+               caloriesBurned: (NSInteger) caloriesBurned
+                    heartRate: (NSInteger)heartRate
+                 sleepMinutes: (NSInteger) sleepMinutes
+                       height: (NSInteger)height
+                       weight: (NSInteger)weight
+                          age: (NSInteger)age;
+
 {
     Today *day = [[[self class] alloc] init];
-    day.id = idid;
+    day.date = date;
     day.steps = steps;
     day.caloriesBurned = caloriesBurned;
-    day.caloriesEaten = caloriesEaten;
-    day.sleepHours = sleepHours;
+    day.heartRate = heartRate;
+    day.sleepMinutes = sleepMinutes;
+    day.height = height;
+    day.weight = weight;
+    day.age = age;
+    
+   
     return day;
 }
 

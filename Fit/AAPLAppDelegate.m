@@ -13,7 +13,7 @@
 #import "AAPLJournalViewController.h"
 #import "AAPLEnergyViewController.h"
 #import "IMFFacebookAuthenticationHandler.h"
-#import <FBSDKCoreKit/FBSDKCoreKit.h>
+//#import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <GooglePlus/GooglePlus.h>
 
 
@@ -38,21 +38,17 @@
 
     [self setUpHealthStoreForTabBarControllers];
     
-    return [[FBSDKApplicationDelegate sharedInstance] application:application
-                                    didFinishLaunchingWithOptions:launchOptions];
+//    return [[FBSDKApplicationDelegate sharedInstance] application:application
+//                                    didFinishLaunchingWithOptions:launchOptions];
     
-    
-    
-    
-
     return YES;
 }
 
 
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    [FBSDKAppEvents activateApp];
-}
+//- (void)applicationDidBecomeActive:(UIApplication *)application {
+//    [FBSDKAppEvents activateApp];
+//}
 
 
 - (BOOL)application: (UIApplication *)application
@@ -91,6 +87,64 @@
             [viewController setHealthStore:self.healthStore];
         }
     }
+}
+
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"Notification Received" message:notification.alertBody delegate:nil 	cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+    [alertView show];
+    
+    AAPLProfileViewController *classs = [AAPLProfileViewController sharedInstanceOfMe];
+    [classs saveDataToDb];
+}
+
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    application.applicationIconBadgeNumber = 0;
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    application.applicationIconBadgeNumber = 0;
+}
+
+
+
+//- (void)application:(UIApplication *)application didReceiveLocalNotification:    (UILocalNotification *)notification
+//{
+//    
+//    NSLog(@"^^^^^^^######## NOTIFICATION");
+//    application.applicationIconBadgeNumber = 0;
+//    [[[AAPLProfileViewController alloc] init] saveDataToDb];
+//
+//}
+
+
+
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    _bgTask = [application beginBackgroundTaskWithName:@"MyTask" expirationHandler:^{
+        // Clean up any unfinished task business by marking where you
+        // stopped or ending the task outright.
+        [application endBackgroundTask:_bgTask];
+        _bgTask = UIBackgroundTaskInvalid;
+    }];
+    
+    // Start the long-running task and return immediately.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        // Do the work associated with the task, preferably in chunks.
+        
+        [application endBackgroundTask:_bgTask];
+        _bgTask = UIBackgroundTaskInvalid;
+    });
 }
 
 @end
