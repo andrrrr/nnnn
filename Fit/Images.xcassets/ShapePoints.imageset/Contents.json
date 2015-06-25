@@ -3,17 +3,17 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "ShapePointsHome.png"
+      "filename" : "ShapePoints.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "ShapePointsHome@2x.png"
+      "filename" : "ShapePoints@2x.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "ShapePointsHome@3x.png"
+      "filename" : "ShapePoints@3x.png"
     }
   ],
   "info" : {

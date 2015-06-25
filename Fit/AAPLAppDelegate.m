@@ -10,9 +10,9 @@
 
 #import "AAPLAppDelegate.h"
 #import "AAPLProfileViewController.h"
-#import "AAPLJournalViewController.h"
-#import "AAPLEnergyViewController.h"
-#import "IMFFacebookAuthenticationHandler.h"
+//#import "AAPLJournalViewController.h"
+//#import "AAPLEnergyViewController.h"
+//#import "IMFFacebookAuthenticationHandler.h"
 //#import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <GooglePlus/GooglePlus.h>
 
@@ -38,8 +38,24 @@
 
     [self setUpHealthStoreForTabBarControllers];
     
-//    return [[FBSDKApplicationDelegate sharedInstance] application:application
-//                                    didFinishLaunchingWithOptions:launchOptions];
+    
+
+    // Override point for customization after application launch.
+    //Set Selected Tab Bar Item to Orange
+    [[UITabBar appearance] setTintColor:[UIColor orangeColor]];
+    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    
+    //Set Navigation BG to selected png pic
+    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"nav_bg.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    //Remove grey shadow from BG pic on navigation bar
+    [[UINavigationBar appearance]setShadowImage:[[UIImage alloc] init]];
+    
+    //Edit Navigation back item
+    [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+    [[UINavigationBar appearance] setBackIndicatorImage:[UIImage imageNamed:@"Back arrow.png"]];
+    [[UINavigationBar appearance] setBackIndicatorTransitionMaskImage:[UIImage imageNamed:@"Back arrow.png"]];
+
     
     return YES;
 }
@@ -61,33 +77,48 @@
 }
 
 
-//FACEBOOK
-//- (BOOL)application:(UIApplication *)application
-//            openURL:(NSURL *)url
-//  sourceApplication:(NSString *)sourceApplication
-//         annotation:(id)annotation {
-//    return [[FBSDKApplicationDelegate sharedInstance] application:application
-//                                                          openURL:url
-//                                                sourceApplication:sourceApplication
-//                                                       annotation:annotation];
-//}
+
 
 #pragma mark - Convenience
 
-// Set the healthStore property on each view controller that will be presented to the user. The root view controller is a tab
-// bar controller. Each tab of the root view controller is a navigation controller which contains its root view controller—
-// these are the subclasses of the view controller that present HealthKit information to the user.
 - (void)setUpHealthStoreForTabBarControllers {
+    
+    
     UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
-
+    
     for (UINavigationController *navigationController in tabBarController.viewControllers) {
         id viewController = navigationController.topViewController;
         
+
         if ([viewController respondsToSelector:@selector(setHealthStore:)]) {
             [viewController setHealthStore:self.healthStore];
         }
     }
+
+    
+    
+//    UINavigationController *navigationController = (UINavigationController *)[self.window rootViewController];
+    
+    //UITabBarController *tabBarController = navigationController.tabBarController;
+    
+//
+//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Storyboard"
+//                                                         bundle: nil];
+//    UITabBarController *tabvc = [storyboard instantiateViewControllerWithIdentifier:@"thisAndThat"];
+//    
+//    for (UINavigationController *navigationController in tabvc.viewControllers) {
+//        
+//        id viewController = navigationController.topViewController;
+//        
+//        if ([viewController respondsToSelector:@selector(setHealthStore:)]) {
+//            NSLog(@"0000000000000 -responds-");
+//            [viewController setHealthStore:self.healthStore];
+//        }
+//    }
 }
+
+
+
 
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification

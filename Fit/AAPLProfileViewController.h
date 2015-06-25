@@ -22,7 +22,7 @@
 @import UIKit;
 @import HealthKit;
 
-@interface AAPLProfileViewController : UITableViewController <GPPSignInDelegate>
+@interface AAPLProfileViewController : UIViewController <GPPSignInDelegate>
 
 // Note that the user's age is not editable.
 @property (nonatomic, weak) IBOutlet UILabel *ageUnitLabel;
@@ -44,6 +44,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *indexLabel;
 
 @property NSInteger countQueries;
+@property (strong, nonatomic) IBOutlet UILabel *stepsPercentage;
+@property (strong, nonatomic) IBOutlet UILabel *sleepPercentage;
+@property (strong, nonatomic) IBOutlet UILabel *heartPercentage;
 
 @property NSInteger stepsYesterday;
 @property NSInteger caloriesBurnedYesterday;

@@ -30,6 +30,10 @@
 		4977D3581B1C8F1A00D1BB04 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4977D3571B1C8F1A00D1BB04 /* FBSDKCoreKit.framework */; };
 		4977D35B1B1C8F3600D1BB04 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4977D3591B1C8F3600D1BB04 /* FBSDKLoginKit.framework */; };
 		4977D35C1B1C8F3600D1BB04 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4977D35A1B1C8F3600D1BB04 /* FBSDKShareKit.framework */; };
+		498FBE6F1B384B580045CC73 /* ActivityViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 498FBE6D1B384B580045CC73 /* ActivityViewController.h */; };
+		498FBE701B384B580045CC73 /* ActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 498FBE6E1B384B580045CC73 /* ActivityViewController.m */; };
+		498FBE731B385C870045CC73 /* LoginViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 498FBE711B385C870045CC73 /* LoginViewController.h */; };
+		498FBE741B385C870045CC73 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 498FBE721B385C870045CC73 /* LoginViewController.m */; };
 		49C90CA91B1611A10093D64E /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 49C90CA81B1611A10093D64E /* Podfile */; };
 		49F26AD91B175E7000CE4948 /* Today.h in Headers */ = {isa = PBXBuildFile; fileRef = 49F26AD71B175E7000CE4948 /* Today.h */; };
 		49F26ADA1B175E7000CE4948 /* Today.m in Sources */ = {isa = PBXBuildFile; fileRef = 49F26AD81B175E7000CE4948 /* Today.m */; };
@@ -77,6 +81,10 @@
 		4977D3571B1C8F1A00D1BB04 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		4977D3591B1C8F3600D1BB04 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		4977D35A1B1C8F3600D1BB04 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
+		498FBE6D1B384B580045CC73 /* ActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityViewController.h; sourceTree = "<group>"; };
+		498FBE6E1B384B580045CC73 /* ActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityViewController.m; sourceTree = "<group>"; };
+		498FBE711B385C870045CC73 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
+		498FBE721B385C870045CC73 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		49C90CA81B1611A10093D64E /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
 		49F26AD71B175E7000CE4948 /* Today.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Today.h; sourceTree = "<group>"; };
 		49F26AD81B175E7000CE4948 /* Today.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Today.m; sourceTree = "<group>"; };
@@ -154,6 +162,10 @@
 			isa = PBXGroup;
 			children = (
 				3EC2BF701964B1AB0097E8FD /* Storyboard.storyboard */,
+				498FBE711B385C870045CC73 /* LoginViewController.h */,
+				498FBE721B385C870045CC73 /* LoginViewController.m */,
+				498FBE6D1B384B580045CC73 /* ActivityViewController.h */,
+				498FBE6E1B384B580045CC73 /* ActivityViewController.m */,
 				3E731F06195208A9002A1E80 /* Fit.entitlements */,
 				4ED4B7FC19283674002C7E33 /* AAPLAppDelegate.h */,
 				4ED4B7FE19283674002C7E33 /* AAPLAppDelegate.m */,
@@ -259,8 +271,10 @@
 				4ED4B81E19283799002C7E33 /* AAPLProfileViewController.h in Headers */,
 				4ED6CAC119287256004BAD02 /* AAPLFoodPickerViewController.h in Headers */,
 				3E359022192E88230010F9FF /* AAPLJournalViewController.h in Headers */,
+				498FBE6F1B384B580045CC73 /* ActivityViewController.h in Headers */,
 				49F26AD91B175E7000CE4948 /* Today.h in Headers */,
 				4ED6CAC519287AE5004BAD02 /* AAPLEnergyViewController.h in Headers */,
+				498FBE731B385C870045CC73 /* LoginViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,6 +398,8 @@
 				4ED4B7FB19283674002C7E33 /* main.m in Sources */,
 				4ED6CAC619287AE5004BAD02 /* AAPLEnergyViewController.m in Sources */,
 				4ED6CABA1928708D004BAD02 /* AAPLJournalViewController.m in Sources */,
+				498FBE741B385C870045CC73 /* LoginViewController.m in Sources */,
+				498FBE701B384B580045CC73 /* ActivityViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -42,10 +42,12 @@ bool allowsAlert;
     [self scheduleNotification];
     
     if ([HKHealthStore isHealthDataAvailable]) {
+        
         NSSet *writeDataTypes = [self dataTypesToWrite];
         NSSet *readDataTypes = [self dataTypesToRead];
         
         [self.healthStore requestAuthorizationToShareTypes:writeDataTypes readTypes:readDataTypes completion:^(BOOL success, NSError *error) {
+            NSLog(@"---HEALTH KIT in completion block---");
             if (!success) {
                 NSLog(@"You didn't allow HealthKit to access these read/write data types. In your app, try to handle this error gracefully when a user decides not to provide access. The error was: %@. If you're using a simulator, try it on a device.", error);
                 
@@ -64,30 +66,73 @@ bool allowsAlert;
                 [self updateUsersSleepLabel];
                 [self updateUsersHeartRateLabel];
                 
-//                [self calculateIndex];
+
             });
         }];
     }
     
-    GPPSignIn *signIn = [GPPSignIn sharedInstance];
-    signIn.shouldFetchGooglePlusUser = YES;
-    //signIn.shouldFetchGoogleUserEmail = YES;  // Uncomment to get the user's email
-    
-    // You previously set kClientId in the "Initialize the Google+ client" step
-    signIn.clientID = kClientId;
-    
-    // Uncomment one of these two statements for the scope you chose in the previous step
-    //signIn.scopes = @[ kGTLAuthScopePlusLogin ];  // "https://www.googleapis.com/auth/plus.login" scope
-    signIn.scopes = @[ @"profile" ];            // "profile" scope
-    
-    // Optional: declare signIn.actions, see "app activities"
-    signIn.delegate = self;
+//    GPPSignIn *signIn = [GPPSignIn sharedInstance];
+//    signIn.shouldFetchGooglePlusUser = YES;
+//    //signIn.shouldFetchGoogleUserEmail = YES;  // Uncomment to get the user's email
+//    
+//    // You previously set kClientId in the "Initialize the Google+ client" step
+//    signIn.clientID = kClientId;
+//    
+//    // Uncomment one of these two statements for the scope you chose in the previous step
+//    //signIn.scopes = @[ kGTLAuthScopePlusLogin ];  // "https://www.googleapis.com/auth/plus.login" scope
+//    signIn.scopes = @[ @"profile" ];            // "profile" scope
+//    
+//    // Optional: declare signIn.actions, see "app activities"
+//    signIn.delegate = self;
     
     
     [self cookBluemix];
 }
 
-
+//-(void)viewDidAppear:(BOOL)animated
+//{
+//    
+//    [super viewDidAppear:animated];
+//    
+//    [self setNotificationTypesAllowed];
+//    
+//    //fire this once a day
+//    [self scheduleNotification];
+//    
+//    if ([HKHealthStore isHealthDataAvailable]) {
+//        
+//        NSSet *writeDataTypes = [self dataTypesToWrite];
+//        NSSet *readDataTypes = [self dataTypesToRead];
+//        NSLog(@"---TTTTTT---");
+//        
+//        
+//        [self.healthStore requestAuthorizationToShareTypes:writeDataTypes readTypes:readDataTypes completion:^(BOOL success, NSError *error) {
+//            NSLog(@"---HEALTH KIT in completion block---");
+//            
+//            if (!success) {
+//                NSLog(@"You didn't allow HealthKit to access these read/write data types. In your app, try to handle this error gracefully when a user decides not to provide access. The error was: %@. If you're using a simulator, try it on a device.", error);
+//                
+//                return;
+//            }
+//            
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                // Update the user interface based on the current user's health information.
+//                counterObservers = 0;
+//                [self registerObservers];
+//                [self updateUsersAgeLabel];
+//                [self updateUsersHeightLabel];
+//                [self updateUsersWeightLabel];
+//                [self updateUsersStepsLabel];
+//                [self updateUsersSleepLabel];
+//                [self updateUsersHeartRateLabel];
+//                
+//            });
+//        }];
+//    }
+//
+//    [self cookBluemix];
+//
+//}
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -130,7 +175,7 @@ bool allowsAlert;
         
     }
     
-    if(counterObservers == 6){[self calculateIndex];  NSLog(@"TTTtTTTTTTT TTTTTTTTT launch calculate index");}
+    if(counterObservers == 6){[self calculateIndex]; }
 }
 
 
@@ -145,9 +190,9 @@ bool allowsAlert;
 }
 
 
-- (void)finishedWithAuth: (GTMOAuth2Authentication *)auth error: (NSError *) error {
-    NSLog(@"Received error %@ and auth object %@",error, auth);
-}
+//- (void)finishedWithAuth: (GTMOAuth2Authentication *)auth error: (NSError *) error {
+//    NSLog(@"Received error %@ and auth object %@",error, auth);
+//}
 
 
 - (void)setNotificationTypesAllowed
@@ -269,7 +314,7 @@ bool allowsAlert;
         
         NSUInteger usersAge = [ageComponents year];
         
-        self.countQueries += 1;
+       
         self.ageYesterday = usersAge;
         self.ageValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersAge) numberStyle:NSNumberFormatterNoStyle];
     }
@@ -305,7 +350,7 @@ bool allowsAlert;
             HKUnit *heightUnit = [HKUnit meterUnitWithMetricPrefix:HKMetricPrefixCenti];
             double usersHeight = [mostRecentQuantity doubleValueForUnit:heightUnit];
             
-            self.countQueries += 1;
+           
             self.heightYesterday = usersHeight;
 
             
@@ -363,10 +408,12 @@ bool allowsAlert;
                                            double value = [quantity doubleValueForUnit:[HKUnit countUnit]];
                                            NSLog(@"#### %@: %f", date, value);
                                            
-                                           
+                                           float someFloat = ((float)value/(float)10000)*100;
+                                           NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
                                            
                                            dispatch_async(dispatch_get_main_queue(), ^{
-                                               self.countQueries += 1;
+                                               self.stepsPercentage.text = str;
+                                               
                                                self.stepsYesterday = value;
                                                self.stepsValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(value) numberStyle:NSNumberFormatterNoStyle];
                                             });
@@ -396,11 +443,18 @@ bool allowsAlert;
             HKUnit *heartRateUnit = [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
             double usersHR = [mostRecentQuantity doubleValueForUnit:heartRateUnit];
             
-            self.heartRateYesterday = usersHR;
+            //self.heartRateYesterday = usersHR;
+            self.heartRateYesterday = (NSInteger)[NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
+            
+            float someFloat = ((float)usersHR/(float)60)*100;
+            NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
+            if(someFloat > 100) {
+                someFloat = 100 - (someFloat - 100);
+            }
             
             // Update the user interface.
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.heartRateYesterday = (NSInteger)[NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
+                self.sleepPercentage.text = str;
                 self.heartRateLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
             });
         }
@@ -435,7 +489,7 @@ bool allowsAlert;
             HKUnit *weightUnit = [HKUnit gramUnit];
             double usersWeight = [mostRecentQuantity doubleValueForUnit:weightUnit]/1000;
             
-            self.countQueries += 1;
+            
             self.weightYesterday = usersWeight;
 
             // Update the user interface.
@@ -463,11 +517,14 @@ bool allowsAlert;
             int minutesNew = (int)minutes - (hours*60);
             NSLog(@"hours slept: %ld:%ld", (long)hours, (long)minutesNew);
             
-            self.countQueries += 1;
+            
             self.sleepMinutesYesterday = minutes;
+            float someFloat = ((float)minutes/(float)480)*100;
+            NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
 
 
             dispatch_async(dispatch_get_main_queue(), ^{
+                self.sleepPercentage.text = str;
                 self.sleepDurationValueLabel.text = [NSString stringWithFormat:@"%d:%d", hours, minutesNew] ;
             });
         }
@@ -683,7 +740,7 @@ bool allowsAlert;
 typedef void(^myCompletion)(Today *today);
 
 - (void)getYesterday:(myCompletion) compblock {
-    self.countQueries = 0;
+    
     __block Today *today;
     
     
@@ -778,7 +835,7 @@ typedef void(^myCompletion)(Today *today);
     NSLog(@"scoreMOVEMENT  %d", scoreMovement);
     NSLog(@"scoreSLEEP  %d", scoreSleep);
     NSLog(@"scoreHR  %d", scoreHeartRate);
-    physicalFitnessScore = scoreMovement*0.55 + scoreSleep*0.2 + scoreHeartRate*0.25;
+    physicalFitnessScore = (scoreMovement*0.55 + scoreSleep*0.2 + scoreHeartRate*0.25)*100;
     NSLog(@"physicalFitnessScore  %f", physicalFitnessScore);
     
     self.indexLabel.text = [NSNumberFormatter localizedStringFromNumber:@(physicalFitnessScore) numberStyle:NSNumberFormatterDecimalStyle];
