@@ -347,7 +347,6 @@ bool allowsAlert;
 }
 
 - (void)updateUsersStepsLabel {
-    
     [self.healthStore getUsersSteps:^(double steps, NSError *error) {
         float someFloat = ((float)steps/(float)10000)*100;
         NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
@@ -364,40 +363,25 @@ bool allowsAlert;
 
 
 - (void)updateUsersHeartRateLabel {
-    HKQuantityType *heartRateType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
-    
-    [self.healthStore aapl_mostRecentQuantitySampleOfType:heartRateType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
-        if (!mostRecentQuantity) {
-            NSLog(@"Either an error occured fetching the user's heart rate information or none has been stored yet. In your app, try to handle this gracefully.");
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.weightValueLabel.text = NSLocalizedString(@"Not available", nil);
-            });
+    [self.healthStore getUsersHeartRate:^(double beats, NSError *error) {
+        float someFloat = ((float)beats/(float)60)*100;
+        //NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
+        if(someFloat > 200){
+            someFloat = 300 - someFloat;
         }
-        else {
-            // Determine the weight in the required unit.
-            HKUnit *heartRateUnit = [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
-            double usersHR = [mostRecentQuantity doubleValueForUnit:heartRateUnit];
-            
-            self.heartRateYesterday = usersHR;
-            //self.heartRateYesterday = (int)[NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
-            
-            float someFloat = ((float)usersHR/(float)60)*100;
-            //NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
-            if(someFloat > 200){
-                someFloat = 300 - someFloat;
-            }
-            else if(someFloat > 100) {
-                someFloat = 200 - someFloat;
-            }
-            
-            // Update the user interface.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.heartPercentage.text = [NSString stringWithFormat:@"%i%%", (int)someFloat];
-                self.heartRateLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
-            });
+        else if(someFloat > 100) {
+            someFloat = 200 - someFloat;
         }
+        self.heartRateYesterday = beats;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.heartPercentage.text = [NSString stringWithFormat:@"%i%%", (int)someFloat];
+            self.heartRateLabel.text = [NSNumberFormatter localizedStringFromNumber:@(beats) numberStyle:NSNumberFormatterNoStyle];
+            
+        });
     }];
+
+
 }
 
 

@@ -208,5 +208,26 @@
     }];
 }
 
+- (void)getUsersHeartRate:(void (^)(double, NSError *))completion2 {
+    HKQuantityType *heartRateType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
+    
+    [self aapl_mostRecentQuantitySampleOfType:heartRateType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
+        if (!mostRecentQuantity) {
+            NSLog(@"Either an error occured fetching the user's heart rate information or none has been stored yet. In your app, try to handle this gracefully.");
+            completion2(0, error);
+            
+        }
+        else {
+            // Determine the weight in the required unit.
+            HKUnit *heartRateUnit = [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
+            double usersHR = [mostRecentQuantity doubleValueForUnit:heartRateUnit];
+
+            completion2(usersHR, error);
+        }
+    }];
+}
+
+
+
 
 @end
