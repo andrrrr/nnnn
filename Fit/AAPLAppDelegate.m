@@ -10,16 +10,11 @@
 
 #import "AAPLAppDelegate.h"
 #import "AAPLProfileViewController.h"
-//#import "AAPLJournalViewController.h"
-//#import "AAPLEnergyViewController.h"
-//#import "IMFFacebookAuthenticationHandler.h"
-//#import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <GooglePlus/GooglePlus.h>
 
 
 
 @import HealthKit;
-
 
 @interface AAPLAppDelegate()
 
@@ -84,37 +79,39 @@
 - (void)setUpHealthStoreForTabBarControllers {
     
     
-    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
-    
-    for (UINavigationController *navigationController in tabBarController.viewControllers) {
-        id viewController = navigationController.topViewController;
-        
-
-        if ([viewController respondsToSelector:@selector(setHealthStore:)]) {
-            [viewController setHealthStore:self.healthStore];
-        }
-    }
-
-    
-    
-//    UINavigationController *navigationController = (UINavigationController *)[self.window rootViewController];
-    
-    //UITabBarController *tabBarController = navigationController.tabBarController;
-    
-//
-//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Storyboard"
-//                                                         bundle: nil];
-//    UITabBarController *tabvc = [storyboard instantiateViewControllerWithIdentifier:@"thisAndThat"];
+//    UITabBarController *tabBarController = (UITabBarController *)[self.window rootViewController];
 //    
-//    for (UINavigationController *navigationController in tabvc.viewControllers) {
-//        
+//    for (UINavigationController *navigationController in tabBarController.viewControllers) {
 //        id viewController = navigationController.topViewController;
 //        
+//
 //        if ([viewController respondsToSelector:@selector(setHealthStore:)]) {
-//            NSLog(@"0000000000000 -responds-");
 //            [viewController setHealthStore:self.healthStore];
 //        }
 //    }
+
+    
+    
+    UINavigationController *navigationController = (UINavigationController *)[self.window rootViewController];
+    
+    UITabBarController *tabBarController = navigationController.tabBarController;
+    
+    
+    
+
+//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Storyboard"
+//                                                         bundle: nil];
+//    UITabBarController *tabvc = [storyboard instantiateViewControllerWithIdentifier:@"thisAndThat"];
+    
+    for (UINavigationController *navigationController in tabBarController.viewControllers) {
+        
+        id viewController = navigationController.topViewController;
+        
+        if ([viewController respondsToSelector:@selector(setHealthStore:)]) {
+            NSLog(@"0000000000000 -responds-");
+            [viewController setHealthStore:self.healthStore];
+        }
+    }
 }
 
 
@@ -124,10 +121,12 @@
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
     UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"Notification Received" message:notification.alertBody delegate:nil 	cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-    [alertView show];
     
-    AAPLProfileViewController *classs = [AAPLProfileViewController sharedInstanceOfMe];
-    [classs saveDataToDb];
+    NSLog(@"NOTIFICATION RECEIVED");
+//    AAPLProfileViewController *classs = [AAPLProfileViewController sharedInstanceOfMe];
+//    [classs saveDataToDb];
+    
+    [alertView show];
 }
 
 

@@ -13,6 +13,7 @@
 		3E35E886192E68FF00C5BC4E /* AAPLFoodItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E35E884192E68FF00C5BC4E /* AAPLFoodItem.h */; };
 		3E35E887192E68FF00C5BC4E /* AAPLFoodItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E35E885192E68FF00C5BC4E /* AAPLFoodItem.m */; };
 		3EC2BF711964B1AB0097E8FD /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3EC2BF701964B1AB0097E8FD /* Storyboard.storyboard */; };
+		491B42E01B3D6BFF00170CB2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 491B42DF1B3D6BFF00170CB2 /* StoreKit.framework */; };
 		495CE8251B1DDDD0002E585A /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495CE8241B1DDDD0002E585A /* AddressBook.framework */; };
 		495CE8271B1DDE08002E585A /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495CE8261B1DDE08002E585A /* AssetsLibrary.framework */; };
 		495CE8291B1DDE15002E585A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495CE8281B1DDE15002E585A /* Foundation.framework */; };
@@ -34,6 +35,15 @@
 		498FBE701B384B580045CC73 /* ActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 498FBE6E1B384B580045CC73 /* ActivityViewController.m */; };
 		498FBE731B385C870045CC73 /* LoginViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 498FBE711B385C870045CC73 /* LoginViewController.h */; };
 		498FBE741B385C870045CC73 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 498FBE721B385C870045CC73 /* LoginViewController.m */; };
+		499582F91B3C1AE5007ABA5A /* libCorePlot-CocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 499582F81B3C1AE5007ABA5A /* libCorePlot-CocoaTouch.a */; };
+		499582FB1B3C1B14007ABA5A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 499582FA1B3C1B14007ABA5A /* QuartzCore.framework */; };
+		499582FD1B3C1B1D007ABA5A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 499582FC1B3C1B1D007ABA5A /* Accelerate.framework */; };
+		499583001B3C1F42007ABA5A /* TesterViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 499582FE1B3C1F42007ABA5A /* TesterViewController.h */; };
+		499583011B3C1F42007ABA5A /* TesterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 499582FF1B3C1F42007ABA5A /* TesterViewController.m */; };
+		499583041B3C34FC007ABA5A /* myCustomSegue.h in Headers */ = {isa = PBXBuildFile; fileRef = 499583021B3C34FC007ABA5A /* myCustomSegue.h */; };
+		499583051B3C34FC007ABA5A /* myCustomSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = 499583031B3C34FC007ABA5A /* myCustomSegue.m */; };
+		499583081B3C3A83007ABA5A /* ContainerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 499583061B3C3A83007ABA5A /* ContainerViewController.h */; };
+		499583091B3C3A83007ABA5A /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 499583071B3C3A83007ABA5A /* ContainerViewController.m */; };
 		49C90CA91B1611A10093D64E /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 49C90CA81B1611A10093D64E /* Podfile */; };
 		49F26AD91B175E7000CE4948 /* Today.h in Headers */ = {isa = PBXBuildFile; fileRef = 49F26AD71B175E7000CE4948 /* Today.h */; };
 		49F26ADA1B175E7000CE4948 /* Today.m in Sources */ = {isa = PBXBuildFile; fileRef = 49F26AD81B175E7000CE4948 /* Today.m */; };
@@ -64,6 +74,7 @@
 		3E38FDAA192C534F00A50A71 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3E731F06195208A9002A1E80 /* Fit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Fit.entitlements; sourceTree = "<group>"; };
 		3EC2BF701964B1AB0097E8FD /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
+		491B42DF1B3D6BFF00170CB2 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		495CE8241B1DDDD0002E585A /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		495CE8261B1DDE08002E585A /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		495CE8281B1DDE15002E585A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -85,12 +96,21 @@
 		498FBE6E1B384B580045CC73 /* ActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityViewController.m; sourceTree = "<group>"; };
 		498FBE711B385C870045CC73 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		498FBE721B385C870045CC73 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		499582F81B3C1AE5007ABA5A /* libCorePlot-CocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libCorePlot-CocoaTouch.a"; path = "/Users/andrew/Desktop/core-plot-master/framework/../build/Debug-iphoneos/libCorePlot-CocoaTouch.a"; sourceTree = "<absolute>"; };
+		499582FA1B3C1B14007ABA5A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		499582FC1B3C1B1D007ABA5A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		499582FE1B3C1F42007ABA5A /* TesterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TesterViewController.h; path = "../../documents-export-2015-06-25/TesterViewController.h"; sourceTree = "<group>"; };
+		499582FF1B3C1F42007ABA5A /* TesterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TesterViewController.m; path = "../../documents-export-2015-06-25/TesterViewController.m"; sourceTree = "<group>"; };
+		499583021B3C34FC007ABA5A /* myCustomSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myCustomSegue.h; sourceTree = "<group>"; };
+		499583031B3C34FC007ABA5A /* myCustomSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = myCustomSegue.m; sourceTree = "<group>"; };
+		499583061B3C3A83007ABA5A /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerViewController.h; sourceTree = "<group>"; };
+		499583071B3C3A83007ABA5A /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		49C90CA81B1611A10093D64E /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
 		49F26AD71B175E7000CE4948 /* Today.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Today.h; sourceTree = "<group>"; };
 		49F26AD81B175E7000CE4948 /* Today.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Today.m; sourceTree = "<group>"; };
 		49F84DCE1B161A0800099261 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		4E120CB41935421000FDB265 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		4ED4B7F519283674002C7E33 /* Fit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4ED4B7F519283674002C7E33 /* Shape.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shape.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4ED4B7F919283674002C7E33 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4ED4B7FA19283674002C7E33 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4ED4B7FC19283674002C7E33 /* AAPLAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AAPLAppDelegate.h; sourceTree = "<group>"; };
@@ -112,6 +132,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				499582FD1B3C1B1D007ABA5A /* Accelerate.framework in Frameworks */,
+				499582FB1B3C1B14007ABA5A /* QuartzCore.framework in Frameworks */,
+				499582F91B3C1AE5007ABA5A /* libCorePlot-CocoaTouch.a in Frameworks */,
 				495CE83F1B1DDEE7002E585A /* GooglePlus.bundle in Frameworks */,
 				495CE83C1B1DDEBB002E585A /* GoogleOpenSource.framework in Frameworks */,
 				495CE83D1B1DDEBB002E585A /* GooglePlus.framework in Frameworks */,
@@ -121,6 +144,7 @@
 				495CE8331B1DDE66002E585A /* MediaPlayer.framework in Frameworks */,
 				495CE8311B1DDE5B002E585A /* CoreText.framework in Frameworks */,
 				495CE82F1B1DDE38002E585A /* CoreGraphics.framework in Frameworks */,
+				491B42E01B3D6BFF00170CB2 /* StoreKit.framework in Frameworks */,
 				495CE82D1B1DDE2D002E585A /* CoreMotion.framework in Frameworks */,
 				495CE82B1B1DDE22002E585A /* CoreLocation.framework in Frameworks */,
 				495CE8291B1DDE15002E585A /* Foundation.framework in Frameworks */,
@@ -153,7 +177,7 @@
 		4ED4B7F619283674002C7E33 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4ED4B7F519283674002C7E33 /* Fit.app */,
+				4ED4B7F519283674002C7E33 /* Shape.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,8 +186,14 @@
 			isa = PBXGroup;
 			children = (
 				3EC2BF701964B1AB0097E8FD /* Storyboard.storyboard */,
+				499583021B3C34FC007ABA5A /* myCustomSegue.h */,
+				499583031B3C34FC007ABA5A /* myCustomSegue.m */,
 				498FBE711B385C870045CC73 /* LoginViewController.h */,
 				498FBE721B385C870045CC73 /* LoginViewController.m */,
+				499582FE1B3C1F42007ABA5A /* TesterViewController.h */,
+				499582FF1B3C1F42007ABA5A /* TesterViewController.m */,
+				499583061B3C3A83007ABA5A /* ContainerViewController.h */,
+				499583071B3C3A83007ABA5A /* ContainerViewController.m */,
 				498FBE6D1B384B580045CC73 /* ActivityViewController.h */,
 				498FBE6E1B384B580045CC73 /* ActivityViewController.m */,
 				3E731F06195208A9002A1E80 /* Fit.entitlements */,
@@ -226,6 +256,10 @@
 		D45FF199A7EA44F04EBCFFE1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				491B42DF1B3D6BFF00170CB2 /* StoreKit.framework */,
+				499582FC1B3C1B1D007ABA5A /* Accelerate.framework */,
+				499582FA1B3C1B14007ABA5A /* QuartzCore.framework */,
+				499582F81B3C1AE5007ABA5A /* libCorePlot-CocoaTouch.a */,
 				495CE83E1B1DDEE7002E585A /* GooglePlus.bundle */,
 				495CE83A1B1DDEBB002E585A /* GoogleOpenSource.framework */,
 				495CE83B1B1DDEBB002E585A /* GooglePlus.framework */,
@@ -267,9 +301,12 @@
 			files = (
 				3E35E886192E68FF00C5BC4E /* AAPLFoodItem.h in Headers */,
 				4ED4B7FD19283674002C7E33 /* AAPLAppDelegate.h in Headers */,
+				499583001B3C1F42007ABA5A /* TesterViewController.h in Headers */,
+				499583041B3C34FC007ABA5A /* myCustomSegue.h in Headers */,
 				00FE738219A5A4F200EEEC5D /* HKHealthStore+AAPLExtensions.h in Headers */,
 				4ED4B81E19283799002C7E33 /* AAPLProfileViewController.h in Headers */,
 				4ED6CAC119287256004BAD02 /* AAPLFoodPickerViewController.h in Headers */,
+				499583081B3C3A83007ABA5A /* ContainerViewController.h in Headers */,
 				3E359022192E88230010F9FF /* AAPLJournalViewController.h in Headers */,
 				498FBE6F1B384B580045CC73 /* ActivityViewController.h in Headers */,
 				49F26AD91B175E7000CE4948 /* Today.h in Headers */,
@@ -298,7 +335,7 @@
 			);
 			name = Fit;
 			productName = FitnessApp;
-			productReference = 4ED4B7F519283674002C7E33 /* Fit.app */;
+			productReference = 4ED4B7F519283674002C7E33 /* Shape.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -314,6 +351,9 @@
 						DevelopmentTeam = F8MCRR249A;
 						SystemCapabilities = {
 							com.apple.HealthKit = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
 						};
@@ -391,11 +431,14 @@
 			files = (
 				3E35E887192E68FF00C5BC4E /* AAPLFoodItem.m in Sources */,
 				4ED4B7FF19283674002C7E33 /* AAPLAppDelegate.m in Sources */,
+				499583091B3C3A83007ABA5A /* ContainerViewController.m in Sources */,
 				4ED6CAC219287256004BAD02 /* AAPLFoodPickerViewController.m in Sources */,
 				49F26ADA1B175E7000CE4948 /* Today.m in Sources */,
 				4ED4B81F19283799002C7E33 /* AAPLProfileViewController.m in Sources */,
+				499583051B3C34FC007ABA5A /* myCustomSegue.m in Sources */,
 				00FE738319A5A4F200EEEC5D /* HKHealthStore+AAPLExtensions.m in Sources */,
 				4ED4B7FB19283674002C7E33 /* main.m in Sources */,
+				499583011B3C1F42007ABA5A /* TesterViewController.m in Sources */,
 				4ED6CAC619287AE5004BAD02 /* AAPLEnergyViewController.m in Sources */,
 				4ED6CABA1928708D004BAD02 /* AAPLJournalViewController.m in Sources */,
 				498FBE741B385C870045CC73 /* LoginViewController.m in Sources */,
@@ -512,8 +555,32 @@
 					"$(PROJECT_DIR)/Fit",
 					"/Users/andrew/Downloads/google-plus-ios-sdk-1.7.1",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/Bolts\"",
+					"\"${PODS_ROOT}/Headers/Public/CDTDatastore\"",
+					"\"${PODS_ROOT}/Headers/Public/CloudantQueryObjc\"",
+					"\"${PODS_ROOT}/Headers/Public/CloudantToolkit\"",
+					"\"${PODS_ROOT}/Headers/Public/CocoaLumberjack\"",
+					"\"${PODS_ROOT}/Headers/Public/FMDB\"",
+					"\"${PODS_ROOT}/Headers/Public/Facebook-iOS-SDK\"",
+					"\"${PODS_ROOT}/Headers/Public/Facebook-iOS-SDK/FacebookSDK\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFCore\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFData\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFFacebookAuthentication\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFGoogleAuthentication\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFPush\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFURLProtocol\"",
+					"\"${PODS_ROOT}/Headers/Public/google-plus-ios-sdk\"",
+					"/Users/andrew/Desktop/core-plot-master/framework/**",
+				);
 				INFOPLIST_FILE = Fit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/andrew/Desktop/core-plot-master/framework/../build/Debug-iphoneos",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -582,7 +649,7 @@
 					"-weak_framework",
 					"\"UIKit\"",
 				);
-				PRODUCT_NAME = Fit;
+				PRODUCT_NAME = Shape;
 				PROVISIONING_PROFILE = "";
 				VALIDATE_PRODUCT = NO;
 			};
@@ -605,8 +672,32 @@
 					"$(PROJECT_DIR)/Fit",
 					"/Users/andrew/Downloads/google-plus-ios-sdk-1.7.1",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/Bolts\"",
+					"\"${PODS_ROOT}/Headers/Public/CDTDatastore\"",
+					"\"${PODS_ROOT}/Headers/Public/CloudantQueryObjc\"",
+					"\"${PODS_ROOT}/Headers/Public/CloudantToolkit\"",
+					"\"${PODS_ROOT}/Headers/Public/CocoaLumberjack\"",
+					"\"${PODS_ROOT}/Headers/Public/FMDB\"",
+					"\"${PODS_ROOT}/Headers/Public/Facebook-iOS-SDK\"",
+					"\"${PODS_ROOT}/Headers/Public/Facebook-iOS-SDK/FacebookSDK\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFCore\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFData\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFFacebookAuthentication\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFGoogleAuthentication\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFPush\"",
+					"\"${PODS_ROOT}/Headers/Public/IMFURLProtocol\"",
+					"\"${PODS_ROOT}/Headers/Public/google-plus-ios-sdk\"",
+					"/Users/andrew/Desktop/core-plot-master/framework/**",
+				);
 				INFOPLIST_FILE = Fit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/andrew/Desktop/core-plot-master/framework/../build/Debug-iphoneos",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -675,7 +766,7 @@
 					"-weak_framework",
 					"\"UIKit\"",
 				);
-				PRODUCT_NAME = Fit;
+				PRODUCT_NAME = Shape;
 				PROVISIONING_PROFILE = "";
 				VALIDATE_PRODUCT = NO;
 			};

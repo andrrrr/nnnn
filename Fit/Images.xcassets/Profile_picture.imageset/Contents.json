@@ -3,17 +3,17 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "Profile_picture.png"
+      "filename" : "emin_profile-2.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "Profile_picture@2x.png"
+      "filename" : "emin_profile-1.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "Profile_picture@3x.png"
+      "filename" : "emin_profile.png"
     }
   ],
   "info" : {

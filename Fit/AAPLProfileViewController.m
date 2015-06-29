@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, AAPLProfileViewControllerTableViewIndex) {
 static NSString * const kClientId = @"528605303997-40kv5mb8qn5eog7e5klea0kcb3o3kp2a.apps.googleusercontent.com";
 
 
+
 @implementation AAPLProfileViewController
 
 int counterObservers;
@@ -36,6 +37,8 @@ bool allowsAlert;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    
+    
     [self setNotificationTypesAllowed];
     
     //fire this once a day
@@ -45,6 +48,8 @@ bool allowsAlert;
         
         NSSet *writeDataTypes = [self dataTypesToWrite];
         NSSet *readDataTypes = [self dataTypesToRead];
+        
+        self.healthStore = [[HKHealthStore alloc] init];
         
         [self.healthStore requestAuthorizationToShareTypes:writeDataTypes readTypes:readDataTypes completion:^(BOOL success, NSError *error) {
             NSLog(@"---HEALTH KIT in completion block---");
@@ -56,8 +61,8 @@ bool allowsAlert;
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 // Update the user interface based on the current user's health information.
-                counterObservers = 0;
-                [self registerObservers];
+                
+                [self registerObserversAndCalculateIndex];
                 
                 [self updateUsersAgeLabel];
                 [self updateUsersHeightLabel];
@@ -89,54 +94,38 @@ bool allowsAlert;
     [self cookBluemix];
 }
 
-//-(void)viewDidAppear:(BOOL)animated
-//{
-//    
-//    [super viewDidAppear:animated];
-//    
-//    [self setNotificationTypesAllowed];
-//    
-//    //fire this once a day
-//    [self scheduleNotification];
-//    
-//    if ([HKHealthStore isHealthDataAvailable]) {
-//        
-//        NSSet *writeDataTypes = [self dataTypesToWrite];
-//        NSSet *readDataTypes = [self dataTypesToRead];
-//        NSLog(@"---TTTTTT---");
-//        
-//        
-//        [self.healthStore requestAuthorizationToShareTypes:writeDataTypes readTypes:readDataTypes completion:^(BOOL success, NSError *error) {
-//            NSLog(@"---HEALTH KIT in completion block---");
-//            
-//            if (!success) {
-//                NSLog(@"You didn't allow HealthKit to access these read/write data types. In your app, try to handle this error gracefully when a user decides not to provide access. The error was: %@. If you're using a simulator, try it on a device.", error);
-//                
-//                return;
-//            }
-//            
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                // Update the user interface based on the current user's health information.
-//                counterObservers = 0;
-//                [self registerObservers];
-//                [self updateUsersAgeLabel];
-//                [self updateUsersHeightLabel];
-//                [self updateUsersWeightLabel];
-//                [self updateUsersStepsLabel];
-//                [self updateUsersSleepLabel];
-//                [self updateUsersHeartRateLabel];
-//                
-//            });
-//        }];
-//    }
-//
-//    [self cookBluemix];
-//
-//}
+-(void)viewDidAppear:(BOOL)animated {
+    NSNumber *value = [NSNumber numberWithInt:UIInterfaceOrientationPortrait];
+    [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+}
+
+- (IBAction)swapButtonPressed:(id)sender
+{
+    NSLog(@"swap button pressed");
+    [self.containerViewController swapViewControllers];
+    //[self.testerViewController redrawGraph];
+}
+
+- (void)swapFromViewController:(UIViewController *)fromViewController toViewController:(UIViewController *)toViewController {
+    
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"embedContainer"]) {
+        
+        self.containerViewController = segue.destinationViewController;
+       // [self.testerViewController redrawGraph];
+    }
+}
+
+
+
+
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    NSLog(@"******^^^^^^^^ From KVO");
+//    NSLog(@"******^^^^^^^^ From KVO");
     
     if([keyPath isEqualToString:@"stepsYesterday"])
     {
@@ -179,8 +168,9 @@ bool allowsAlert;
 }
 
 
-- (void)registerObservers
+- (void)registerObserversAndCalculateIndex
 {
+    counterObservers = 0;
     [self addObserver:self forKeyPath:@"stepsYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self addObserver:self forKeyPath:@"ageYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self addObserver:self forKeyPath:@"heightYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
@@ -190,9 +180,46 @@ bool allowsAlert;
 }
 
 
-//- (void)finishedWithAuth: (GTMOAuth2Authentication *)auth error: (NSError *) error {
-//    NSLog(@"Received error %@ and auth object %@",error, auth);
-//}
+
+
+- (void)finishedWithAuth:(GTMOAuth2Authentication *)auth error:(NSError *)error {
+    NSLog(@"Received Error %@ and auth object==%@", error, auth);
+    
+    if (error) {
+        NSLog(@"ERROR: google authentication %@", error);
+    } else {
+        //[self refreshInterfaceBasedOnSignIn];
+        
+        GTLQueryPlus *query = [GTLQueryPlus queryForPeopleGetWithUserId:@"me"];
+        
+        NSLog(@"email %@ ", [NSString stringWithFormat:@"Email: %@",[GPPSignIn sharedInstance].authentication.userEmail]);
+        NSLog(@"Received error %@ and auth object %@",error, auth);
+        
+        // 1. Create a |GTLServicePlus| instance to send a request to Google+.
+        GTLServicePlus* plusService = [[GTLServicePlus alloc] init] ;
+        plusService.retryEnabled = YES;
+        
+        // 2. Set a valid |GTMOAuth2Authentication| object as the authorizer.
+        [plusService setAuthorizer:[GPPSignIn sharedInstance].authentication];
+        
+        // 3. Use the "v1" version of the Google+ API.*
+        plusService.apiVersion = @"v1";
+        [plusService executeQuery:query
+                completionHandler:^(GTLServiceTicket *ticket,
+                                    GTLPlusPerson *person,
+                                    NSError *error) {
+                    if (error) {
+                        //Handle Error
+                    } else {
+                        NSLog(@"Email= %@", [GPPSignIn sharedInstance].authentication.userEmail);
+                        NSLog(@"GoogleID=%@", person.identifier);
+                        NSLog(@"User Name=%@", [person.name.givenName stringByAppendingFormat:@" %@", person.name.familyName]);
+                        NSLog(@"Gender=%@", person.gender);
+                    }
+                }];
+    }
+}
+
 
 
 - (void)setNotificationTypesAllowed
@@ -227,6 +254,7 @@ bool allowsAlert;
         }else{
             _remotedatastore = createdStore;
             NSLog(@"Successfully created store: %@", _remotedatastore.name);
+            
             [_remotedatastore.mapper setDataType:@"Today" forClassName:NSStringFromClass([Today class])];
             [self createIndex: _remotedatastore];
         }
@@ -247,29 +275,34 @@ bool allowsAlert;
     NSString *dataType = [store.mapper dataTypeForClassName:NSStringFromClass([Today class])];
     
     // Create the index
-    [store createIndexWithDataType:dataType fields:@[ @"steps", @"caloriesBurned", @"heartRate", @"sleepMinutes", @"height", @"weight", @"age"] completionHandler:^(NSError *error) {
+    [store createIndexWithDataType:dataType fields:@[ @"date", @"userEmail", @"steps", @"caloriesBurned", @"heartRate", @"sleepMinutes", @"height", @"weight", @"age", @"groupId" ] completionHandler:^(NSError *error) {
         if(error){
-            NSLog(@"error trying to create index in store");
+            NSLog(@"error trying to create index in store, %@", error);
         }else{
             NSLog(@"successfully created index in store");
         }
     }];
 }
 
+
+
 #pragma mark - HealthKit Permissions
 
 // Returns the types of data that Fit wishes to write to HealthKit.
 - (NSSet *)dataTypesToWrite {
-    HKQuantityType *dietaryCalorieEnergyType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryEnergyConsumed];
-    HKQuantityType *activeEnergyBurnType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned];
-    HKQuantityType *heightType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
-    HKQuantityType *weightType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
-    HKQuantityType *distanceType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning];
-    HKQuantityType *stepsType = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
-    HKQuantityType *heartRateType = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
-    HKCategoryType *sleepType = [HKSampleType categoryTypeForIdentifier:HKCategoryTypeIdentifierSleepAnalysis];
+//    HKQuantityType *dietaryCalorieEnergyType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryEnergyConsumed];
+//    HKQuantityType *activeEnergyBurnType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned];
+//    HKQuantityType *heightType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
+//    HKQuantityType *weightType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
+//    HKQuantityType *distanceType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning];
+//    HKQuantityType *stepsType = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+//    HKQuantityType *heartRateType = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
+//    HKCategoryType *sleepType = [HKSampleType categoryTypeForIdentifier:HKCategoryTypeIdentifierSleepAnalysis];
     
-    return [NSSet setWithObjects:dietaryCalorieEnergyType, activeEnergyBurnType, heightType, weightType, distanceType, stepsType, sleepType, heartRateType, nil];
+//    return [NSSet setWithObjects:dietaryCalorieEnergyType, activeEnergyBurnType, heightType, weightType, distanceType, stepsType, sleepType, heartRateType, nil];
+    
+    
+    return [NSSet setWithObjects:nil];
 }
 
 // Returns the types of data that Fit wishes to read from HealthKit.
@@ -294,136 +327,39 @@ bool allowsAlert;
 #pragma mark - Reading HealthKit Data
 
 - (void)updateUsersAgeLabel {
-    // Set the user's age unit (years).
-    self.ageUnitLabel.text = NSLocalizedString(@"Age (yrs)", nil);
-    
-    NSError *error;
-    NSDate *dateOfBirth = [self.healthStore dateOfBirthWithError:&error];
-    
-    if (!dateOfBirth) {
-        NSLog(@"Either an error occured fetching the user's age information or none has been stored yet. In your app, try to handle this gracefully.");
-        
-        //return @"Not available";
-        self.ageValueLabel.text = NSLocalizedString(@"Not available", nil);
-    }
-    else {
-        // Compute the age of the user.
-        NSDate *now = [NSDate date];
-        
-        NSDateComponents *ageComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:dateOfBirth toDate:now options:NSCalendarWrapComponents];
-        
-        NSUInteger usersAge = [ageComponents year];
-        
-       
-        self.ageYesterday = usersAge;
-        self.ageValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersAge) numberStyle:NSNumberFormatterNoStyle];
-    }
+
+    NSUInteger usersAge = [self.healthStore getUsersAge];
+    NSString *inStr = [NSString stringWithFormat: @"%ld years", (long)usersAge];
+    self.ageYesterday = usersAge;
+    self.ageValueLabel.text = inStr;
+
 }
 
 - (void)updateUsersHeightLabel {
-    // Fetch user's default height unit in meters.
-    NSLengthFormatter *lengthFormatter = [[NSLengthFormatter alloc] init];
-    lengthFormatter.unitStyle = NSFormattingUnitStyleLong;
     
-    NSLengthFormatterUnit heightFormatterUnit = NSLengthFormatterUnitCentimeter;
-    NSString *heightUnitString = [lengthFormatter unitStringFromValue:10 unit:heightFormatterUnit];
-    NSString *localizedHeightUnitDescriptionFormat = NSLocalizedString(@"Height (%@)", nil);
-    
-    self.heightUnitLabel.text = [NSString stringWithFormat:localizedHeightUnitDescriptionFormat, heightUnitString];
-
-    HKQuantityType *heightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
-   
-    // Query to get the user's latest height, if it exists.
-    [self.healthStore aapl_mostRecentQuantitySampleOfType:heightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
-        if (!mostRecentQuantity) {
-            NSLog(@"Either an error occured fetching the user's height information or none has been stored yet. In your app, try to handle this gracefully.");
+    [self.healthStore getUsersHeight:^(double height, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.heightYesterday = height;
+            self.heightValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(height) numberStyle:NSNumberFormatterNoStyle];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                self.heightValueLabel.text = NSLocalizedString(@"Not available", nil);
-            });
-            
-        }
-        else {
-            // Determine the height in the required unit.
-            
-            HKUnit *heightUnit = [HKUnit meterUnitWithMetricPrefix:HKMetricPrefixCenti];
-            double usersHeight = [mostRecentQuantity doubleValueForUnit:heightUnit];
-            
-           
-            self.heightYesterday = usersHeight;
-
-            
-            
-            // Update the user interface.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.heightValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersHeight) numberStyle:NSNumberFormatterNoStyle];
-
-            });
-        }
+        });
     }];
 }
-    
-    
+
 - (void)updateUsersStepsLabel {
     
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *interval = [[NSDateComponents alloc] init];
-    interval.day = 1;
-    
-    NSDateComponents *anchorComponents = [calendar components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear
-                                                     fromDate:[NSDate date]];
-    anchorComponents.hour = 0;
-    NSDate *anchorDate = [calendar dateFromComponents:anchorComponents];
-    HKQuantityType *quantityType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
-    
-    // Create the query
-    HKStatisticsCollectionQuery *query = [[HKStatisticsCollectionQuery alloc] initWithQuantityType:quantityType
-                                                                           quantitySamplePredicate:nil
-                                                                                           options:HKStatisticsOptionCumulativeSum
-                                                                                        anchorDate:anchorDate
-                                                                                intervalComponents:interval];
-    
-    // Set the results handler
-    query.initialResultsHandler = ^(HKStatisticsCollectionQuery *query, HKStatisticsCollection *results, NSError *error) {
-        if (error) {
-            // Perform proper error handling here
-            NSLog(@"*** An error occurred while calculating the statistics: %@ ***",error.localizedDescription);
-        }
+    [self.healthStore getUsersSteps:^(double steps, NSError *error) {
+        float someFloat = ((float)steps/(float)10000)*100;
+        NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
+        self.stepsYesterday = steps;
         
-        NSDate *endDate = [NSDate date];
-        NSDate *startDate = [calendar dateByAddingUnit:NSCalendarUnitDay
-                                                 value:0
-                                                toDate:endDate
-                                               options:0];
-        
-        // Plot the daily step counts over the past x days
-        [results enumerateStatisticsFromDate:startDate
-                                      toDate:endDate
-                                   withBlock:^(HKStatistics *result, BOOL *stop) {
-                                       
-                                       HKQuantity *quantity = result.sumQuantity;
-                                       if (quantity) {
-                                           NSDate *date = result.startDate;
-                                           double value = [quantity doubleValueForUnit:[HKUnit countUnit]];
-                                           NSLog(@"#### %@: %f", date, value);
-                                           
-                                           float someFloat = ((float)value/(float)10000)*100;
-                                           NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
-                                           
-                                           dispatch_async(dispatch_get_main_queue(), ^{
-                                               self.stepsPercentage.text = str;
-                                               
-                                               self.stepsYesterday = value;
-                                               self.stepsValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(value) numberStyle:NSNumberFormatterNoStyle];
-                                            });
-                                       }
-                                   }];
-    };
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.stepsPercentage.text = str;
+            self.stepsValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(steps) numberStyle:NSNumberFormatterNoStyle];
+            
+        });
+    }];
     
-    [self.healthStore executeQuery:query];
-
-    self.stepsUnitLabel.text = [NSString stringWithFormat:@"Steps (yesterday)"];
 }
 
 
@@ -443,18 +379,21 @@ bool allowsAlert;
             HKUnit *heartRateUnit = [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
             double usersHR = [mostRecentQuantity doubleValueForUnit:heartRateUnit];
             
-            //self.heartRateYesterday = usersHR;
-            self.heartRateYesterday = (NSInteger)[NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
+            self.heartRateYesterday = usersHR;
+            //self.heartRateYesterday = (int)[NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
             
             float someFloat = ((float)usersHR/(float)60)*100;
-            NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
-            if(someFloat > 100) {
-                someFloat = 100 - (someFloat - 100);
+            //NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
+            if(someFloat > 200){
+                someFloat = 300 - someFloat;
+            }
+            else if(someFloat > 100) {
+                someFloat = 200 - someFloat;
             }
             
             // Update the user interface.
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.sleepPercentage.text = str;
+                self.heartPercentage.text = [NSString stringWithFormat:@"%i%%", (int)someFloat];
                 self.heartRateLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersHR) numberStyle:NSNumberFormatterNoStyle];
             });
         }
@@ -463,69 +402,42 @@ bool allowsAlert;
 
 
 - (void)updateUsersWeightLabel {
-    // Fetch the user's default weight unit in pounds.
-    NSMassFormatter *massFormatter = [[NSMassFormatter alloc] init];
-    massFormatter.unitStyle = NSFormattingUnitStyleLong;
     
-    NSMassFormatterUnit weightFormatterUnit = NSMassFormatterUnitKilogram;
-    NSString *weightUnitString = [massFormatter unitStringFromValue:10 unit:weightFormatterUnit];
-    NSString *localizedWeightUnitDescriptionFormat = NSLocalizedString(@"Weight (%@)", nil);
-
-    self.weightUnitLabel.text = [NSString stringWithFormat:localizedWeightUnitDescriptionFormat, weightUnitString];
-    
-    // Query to get the user's latest weight, if it exists.
-    HKQuantityType *weightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
-
-    [self.healthStore aapl_mostRecentQuantitySampleOfType:weightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
-        if (!mostRecentQuantity) {
-            NSLog(@"Either an error occured fetching the user's weight information or none has been stored yet. In your app, try to handle this gracefully.");
+    [self.healthStore getUsersWeight:^(double kilos, NSError *error) {
+        self.weightYesterday = kilos;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.self.weightValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(kilos) numberStyle:NSNumberFormatterNoStyle];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.weightValueLabel.text = NSLocalizedString(@"Not available", nil);
-            });
-        }
-        else {
-            // Determine the weight in the required unit.
-            HKUnit *weightUnit = [HKUnit gramUnit];
-            double usersWeight = [mostRecentQuantity doubleValueForUnit:weightUnit]/1000;
-            
-            
-            self.weightYesterday = usersWeight;
-
-            // Update the user interface.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                self.weightValueLabel.text = [NSNumberFormatter localizedStringFromNumber:@(usersWeight) numberStyle:NSNumberFormatterNoStyle];
-            });
-        }
+        });
     }];
+
+
+
 }
 
 
 - (void)updateUsersSleepLabel {
-    [self.healthStore hkQueryExecute: ^(double minutes, NSError *error) {
+    [self.healthStore getUsersSleep: ^(double minutes, NSError *error) {
         if (minutes == 0) {
             NSLog(@"Either an error occured fetching the user's sleep information or none has been stored yet.");
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.sleepDurationValueLabel.text = NSLocalizedString(@"Not available", nil);
+                self.sleepDurationValueLabel.text = NSLocalizedString(@"NA", nil);
             });
         }
         else {
-            
-            int hours = (int)minutes / 60;
+            self.sleepPercentage.text = @"";
+            int hours = (int)(minutes / 60);
             int minutesNew = (int)minutes - (hours*60);
-            NSLog(@"hours slept: %ld:%ld", (long)hours, (long)minutesNew);
-            
             
             self.sleepMinutesYesterday = minutes;
-            float someFloat = ((float)minutes/(float)480)*100;
-            NSString *str = [NSString stringWithFormat:@"%i%%", (int)someFloat];
+            float someFloat1 = ((float)minutes/(float)480)*100;
 
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.sleepPercentage.text = str;
-                self.sleepDurationValueLabel.text = [NSString stringWithFormat:@"%d:%d", hours, minutesNew] ;
+                self.sleepPercentage.text = [NSString stringWithFormat:@"%d%%", (int)someFloat1];
+                self.sleepDurationValueLabel.text = [NSString stringWithFormat:@"%d:%d", hours, minutesNew];
             });
         }
     }];
@@ -541,7 +453,7 @@ bool allowsAlert;
     UILocalNotification *notification = [[UILocalNotification alloc] init];
     if (notification)
     {
-        NSDate *today =[NSDate date];
+        //NSDate *today =[NSDate date];
         NSCalendar *calendar = [NSCalendar currentCalendar];
         
         //for adding 3 minutes from now
@@ -554,8 +466,8 @@ bool allowsAlert;
         
         NSCalendarOptions options = NSCalendarMatchNextTime;
         NSDate *nextNight = [calendar nextDateAfterDate:[NSDate date]
-                                                matchingHour:16
-                                                      minute:46
+                                                matchingHour:11
+                                                      minute:25
                                                       second:43
                                                      options:options];
         
@@ -600,109 +512,109 @@ bool allowsAlert;
 
 #pragma mark - Writing HealthKit Data
 
-- (void)saveHeightIntoHealthStore:(double)height {
-    // Save the user's height into HealthKit.
-    HKUnit *meterUnit = [HKUnit meterUnit];
-    HKQuantity *heightQuantity = [HKQuantity quantityWithUnit:meterUnit doubleValue:height];
-
-    HKQuantityType *heightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
-    NSDate *now = [NSDate date];
-    
-    HKQuantitySample *heightSample = [HKQuantitySample quantitySampleWithType:heightType quantity:heightQuantity startDate:now endDate:now];
-    
-    [self.healthStore saveObject:heightSample withCompletion:^(BOOL success, NSError *error) {
-        if (!success) {
-            NSLog(@"An error occured saving the height sample %@. In your app, try to handle this gracefully. The error was: %@.", heightSample, error);
-            abort();
-        }
-
-        [self updateUsersHeightLabel];
-    }];
-}
-
-- (void)saveWeightIntoHealthStore:(double)weight {
-    // Save the user's weight into HealthKit.
-    HKUnit *poundUnit = [HKUnit poundUnit];
-    HKQuantity *weightQuantity = [HKQuantity quantityWithUnit:poundUnit doubleValue:weight];
-
-    HKQuantityType *weightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
-    NSDate *now = [NSDate date];
-    
-    HKQuantitySample *weightSample = [HKQuantitySample quantitySampleWithType:weightType quantity:weightQuantity startDate:now endDate:now];
-    
-    [self.healthStore saveObject:weightSample withCompletion:^(BOOL success, NSError *error) {
-        if (!success) {
-            NSLog(@"An error occured saving the weight sample %@. In your app, try to handle this gracefully. The error was: %@.", weightSample, error);
-            abort();
-        }
-
-        [self updateUsersWeightLabel];
-    }];
-}
+//- (void)saveHeightIntoHealthStore:(double)height {
+//    // Save the user's height into HealthKit.
+//    HKUnit *meterUnit = [HKUnit meterUnit];
+//    HKQuantity *heightQuantity = [HKQuantity quantityWithUnit:meterUnit doubleValue:height];
+//
+//    HKQuantityType *heightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
+//    NSDate *now = [NSDate date];
+//    
+//    HKQuantitySample *heightSample = [HKQuantitySample quantitySampleWithType:heightType quantity:heightQuantity startDate:now endDate:now];
+//    
+//    [self.healthStore saveObject:heightSample withCompletion:^(BOOL success, NSError *error) {
+//        if (!success) {
+//            NSLog(@"An error occured saving the height sample %@. In your app, try to handle this gracefully. The error was: %@.", heightSample, error);
+//            abort();
+//        }
+//
+//        [self updateUsersHeightLabel];
+//    }];
+//}
+//
+//- (void)saveWeightIntoHealthStore:(double)weight {
+//    // Save the user's weight into HealthKit.
+//    HKUnit *poundUnit = [HKUnit poundUnit];
+//    HKQuantity *weightQuantity = [HKQuantity quantityWithUnit:poundUnit doubleValue:weight];
+//
+//    HKQuantityType *weightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
+//    NSDate *now = [NSDate date];
+//    
+//    HKQuantitySample *weightSample = [HKQuantitySample quantitySampleWithType:weightType quantity:weightQuantity startDate:now endDate:now];
+//    
+//    [self.healthStore saveObject:weightSample withCompletion:^(BOOL success, NSError *error) {
+//        if (!success) {
+//            NSLog(@"An error occured saving the weight sample %@. In your app, try to handle this gracefully. The error was: %@.", weightSample, error);
+//            abort();
+//        }
+//
+//        [self updateUsersWeightLabel];
+//    }];
+//}
 
 #pragma mark - UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    AAPLProfileViewControllerTableViewIndex index = (AAPLProfileViewControllerTableViewIndex)indexPath.row;
-    
-    // We won't allow people to change their date of birth, so ignore selection of the age cell.
-    if (index == AAPLProfileViewControllerTableViewIndexAge) {
-        return;
-    }
-    
-    // Set up variables based on what row the user has selected.
-    NSString *title;
-    void (^valueChangedHandler)(double value);
-    
-    if (index == AAPLProfileViewControllerTableViewIndexHeight) {
-        title = NSLocalizedString(@"Your Height", nil);
-
-        valueChangedHandler = ^(double value) {
-            [self saveHeightIntoHealthStore:value];
-        };
-    }
-    else if (index == AAPLProfileViewControllerTableViewIndexWeight) {
-        title = NSLocalizedString(@"Your Weight", nil);
-        
-        valueChangedHandler = ^(double value) {
-            [self saveWeightIntoHealthStore:value];
-        };
-    }
-    
-    // Create an alert controller to present.
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
-    
-    // Add the text field to let the user enter a numeric value.
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        // Only allow the user to enter a valid number.
-        textField.keyboardType = UIKeyboardTypeDecimalPad;
-    }];
-    
-    // Create the "OK" button.
-    NSString *okTitle = NSLocalizedString(@"OK", nil);
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        UITextField *textField = alertController.textFields.firstObject;
-        
-        double value = textField.text.doubleValue;
-        
-        valueChangedHandler(value);
-        
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    }];
-
-    [alertController addAction:okAction];
-    
-    // Create the "Cancel" button.
-    NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    }];
-
-    [alertController addAction:cancelAction];
-    
-    // Present the alert controller.
-    [self presentViewController:alertController animated:YES completion:nil];
-}
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+//    AAPLProfileViewControllerTableViewIndex index = (AAPLProfileViewControllerTableViewIndex)indexPath.row;
+//    
+//    // We won't allow people to change their date of birth, so ignore selection of the age cell.
+//    if (index == AAPLProfileViewControllerTableViewIndexAge) {
+//        return;
+//    }
+//    
+//    // Set up variables based on what row the user has selected.
+//    NSString *title;
+//    void (^valueChangedHandler)(double value);
+//    
+//    if (index == AAPLProfileViewControllerTableViewIndexHeight) {
+//        title = NSLocalizedString(@"Your Height", nil);
+//
+//        valueChangedHandler = ^(double value) {
+//            [self saveHeightIntoHealthStore:value];
+//        };
+//    }
+//    else if (index == AAPLProfileViewControllerTableViewIndexWeight) {
+//        title = NSLocalizedString(@"Your Weight", nil);
+//        
+//        valueChangedHandler = ^(double value) {
+//            [self saveWeightIntoHealthStore:value];
+//        };
+//    }
+//    
+//    // Create an alert controller to present.
+//    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
+//    
+//    // Add the text field to let the user enter a numeric value.
+//    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+//        // Only allow the user to enter a valid number.
+//        textField.keyboardType = UIKeyboardTypeDecimalPad;
+//    }];
+//    
+//    // Create the "OK" button.
+//    NSString *okTitle = NSLocalizedString(@"OK", nil);
+//    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+//        UITextField *textField = alertController.textFields.firstObject;
+//        
+//        double value = textField.text.doubleValue;
+//        
+//        valueChangedHandler(value);
+//        
+//        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    }];
+//
+//    [alertController addAction:okAction];
+//    
+//    // Create the "Cancel" button.
+//    NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
+//    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+//        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    }];
+//
+//    [alertController addAction:cancelAction];
+//    
+//    // Present the alert controller.
+//    [self presentViewController:alertController animated:YES completion:nil];
+//}
 
 #pragma mark - Convenience
 
@@ -737,33 +649,52 @@ bool allowsAlert;
     }];
 }
 
+
+//- (void) saveDataWithInputDay:(Today*) today{
+//    CDTStore *store = _remotedatastore;
+//    
+//    
+//        [store save:today completionHandler:^(id savedObject, NSError *error) {
+//        if (error) {
+//            NSLog(@"Error trying to save object to the cloud: %@", error);
+//        } else {
+//            // use the result
+//            Today *savedToday = savedObject;
+//            NSLog(@"saved revision: %@", savedToday);
+//        }
+//            
+//    }];
+//}
+
+
+
 typedef void(^myCompletion)(Today *today);
 
 - (void)getYesterday:(myCompletion) compblock {
     
-    __block Today *today;
+   // __block Today *today;
     
     
     dispatch_group_t group = dispatch_group_create();
     
     dispatch_group_async(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
-        [self updateUsersStepsLabel];
+        
+        [self registerObserversAndCalculateIndex];
+        
         [self updateUsersAgeLabel];
-        [self updateUsersSleepLabel];
         [self updateUsersHeightLabel];
         [self updateUsersWeightLabel];
+        [self updateUsersStepsLabel];
+        [self updateUsersSleepLabel];
+        [self updateUsersHeartRateLabel];
         
-        
-
     });
     
 
     
     dispatch_group_notify(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
         
-        
-        [NSThread sleepForTimeInterval:8.0];
-        
+        NSLog(@"### physicalFitnessScoreYesterday, %ld", (long)self.physicalFitnessScoreYesterday);
         NSLog(@"### stepsYest, %ld", (long)self.stepsYesterday);
         NSLog(@"### ageYest, %ld", (long)self.ageYesterday);
         NSLog(@"### heightYesterday, %ld", (long)self.heightYesterday);
@@ -777,7 +708,8 @@ typedef void(^myCompletion)(Today *today);
         NSDate *yesterday = [cal dateByAddingComponents:components toDate:todayDate options:0];
         
         
-        today = [[Today alloc] initWithDate:yesterday steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday ];
+        Today *today = [[Today alloc] initWithDate:yesterday physicalFitnessScore:self.physicalFitnessScoreYesterday userEmail:@"" steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
+        
         compblock(today);
     });
 }
@@ -790,12 +722,12 @@ typedef void(^myCompletion)(Today *today);
     
     double physicalFitnessScore;
     
-    NSLog(@"### stepsYest, %ld", (long)self.stepsYesterday);
-    NSLog(@"### ageYest, %ld", (long)self.ageYesterday);
-    NSLog(@"### heightYesterday, %ld", (long)self.heightYesterday);
-    NSLog(@"### weightYesterday, %ld", (long)self.weightYesterday);
-    NSLog(@"### sleepMinutesYesterday, %ld", (long)self.sleepMinutesYesterday);
-    NSLog(@"### heartRateYesterday, %ld", (long)self.heartRateYesterday);
+    NSLog(@"### calculateIndex: stepsYest, %ld", (long)self.stepsYesterday);
+    NSLog(@"### calculateIndex: ageYest, %ld", (long)self.ageYesterday);
+    NSLog(@"### calculateIndex: heightYesterday, %ld", (long)self.heightYesterday);
+    NSLog(@"### calculateIndex: weightYesterday, %ld", (long)self.weightYesterday);
+    NSLog(@"### calculateIndex: sleepMinutesYesterday, %ld", (long)self.sleepMinutesYesterday);
+    NSLog(@"### calculateIndex: heartRateYesterday, %ld", (long)self.heartRateYesterday);
     
     //calculate score movement
     if (self.stepsYesterday < 3000) scoreMovement = 0;
@@ -828,17 +760,34 @@ typedef void(^myCompletion)(Today *today);
     
     //calculate score heart rate
     if(self.heartRateYesterday<=39 || self.heartRateYesterday>=100 )scoreHeartRate = 0;
-    else if(self.heartRateYesterday>=40 || self.heartRateYesterday<=49 )scoreHeartRate = 3;
-    else if(self.heartRateYesterday>=50 || self.heartRateYesterday<=59 )scoreHeartRate = 2;
-    else if(self.heartRateYesterday>=60 || self.heartRateYesterday<=99 )scoreHeartRate = 1;
+    else if(self.heartRateYesterday>=40 && self.heartRateYesterday<=49 )scoreHeartRate = 3;
+    else if(self.heartRateYesterday>=50 && self.heartRateYesterday<=59 )scoreHeartRate = 2;
+    else if(self.heartRateYesterday>=60 && self.heartRateYesterday<=99 )scoreHeartRate = 1;
     
     NSLog(@"scoreMOVEMENT  %d", scoreMovement);
     NSLog(@"scoreSLEEP  %d", scoreSleep);
     NSLog(@"scoreHR  %d", scoreHeartRate);
     physicalFitnessScore = (scoreMovement*0.55 + scoreSleep*0.2 + scoreHeartRate*0.25)*100;
     NSLog(@"physicalFitnessScore  %f", physicalFitnessScore);
+    self.physicalFitnessScoreYesterday = physicalFitnessScore;
     
-    self.indexLabel.text = [NSNumberFormatter localizedStringFromNumber:@(physicalFitnessScore) numberStyle:NSNumberFormatterDecimalStyle];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.indexLabel.text = [NSNumberFormatter localizedStringFromNumber:@(physicalFitnessScore) numberStyle:NSNumberFormatterDecimalStyle];
+        
+    });
+    
+    
+    self.BMIlabel.text = @"";
+    double BMI = 0;
+    if(self.heightYesterday!=0){
+        BMI = 100*100*(double)self.weightYesterday/((double)self.heightYesterday*(double)self.heightYesterday);
+        NSLog(@"BMI: %f", BMI);
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.BMIlabel.text = [NSNumberFormatter localizedStringFromNumber:@(BMI) numberStyle:NSNumberFormatterNoStyle];
+     });
+   
 }
 
 -(void)presentWarningWithText:(NSString*)msgText {
@@ -867,13 +816,12 @@ typedef void(^myCompletion)(Today *today);
             notification.soundName = UILocalNotificationDefaultSoundName;
         }
         
-        
         // this will fire the notification right away, it will still also fire at the date we set
         [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
     }
 }
 
-+ (AAPLProfileViewController *)sharedInstanceOfMe
+- (Today *)sharedInstanceOfToday
 {
     static AAPLProfileViewController *sharedInstanceOfMe = nil;
     static dispatch_once_t onceToken;
@@ -881,6 +829,25 @@ typedef void(^myCompletion)(Today *today);
         sharedInstanceOfMe = [[AAPLProfileViewController alloc] init];
     });
     return sharedInstanceOfMe;
+
+    
+    
+//    NSDate *todayDate =[NSDate date];
+//    NSCalendar *cal = [NSCalendar currentCalendar];
+//    NSDateComponents *components = [[NSDateComponents alloc] init];
+//    [components setDay:-1];
+//    NSDate *yesterday = [cal dateByAddingComponents:components toDate:todayDate options:0];
+//
+//    
+//    
+//    static Today *sharedInstanceOfToday = nil;
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        sharedInstanceOfToday = [[Today alloc] initWithDate:yesterday physicalFitnessScore:self.physicalFitnessScoreYesterday userEmail:@"" steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
+//    });
+//    return sharedInstanceOfToday;
+    
+  
 }
 
 - (IBAction)sendData:(id)sender {

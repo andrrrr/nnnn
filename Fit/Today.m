@@ -11,16 +11,21 @@
 @implementation Today
 
 -(instancetype) initWithDate: (NSDate*) date
-                        steps: (NSInteger) steps
-               caloriesBurned: (NSInteger) caloriesBurned
-                    heartRate: (NSInteger)heartRate
-                 sleepMinutes: (NSInteger) sleepMinutes
-                       height: (NSInteger)height
-                       weight: (NSInteger)weight
-                          age: (NSInteger)age;
+physicalFitnessScoreYesterday:(NSInteger)physicalFitnessScore
+                   userEmail:(NSString*) userEmail
+                       steps: (NSInteger) steps
+              caloriesBurned: (NSInteger) caloriesBurned
+                   heartRate: (NSInteger)heartRate
+                sleepMinutes: (NSInteger) sleepMinutes
+                      height: (NSInteger)height
+                      weight: (NSInteger)weight
+                         age: (NSInteger)age
+                     groupId:(NSInteger)groupId;
 
 {
     Today *day = [[[self class] alloc] init];
+    day.physicalFitnessScore = physicalFitnessScore;
+    day.userEmail = userEmail;
     day.date = date;
     day.steps = steps;
     day.caloriesBurned = caloriesBurned;
@@ -29,12 +34,9 @@
     day.height = height;
     day.weight = weight;
     day.age = age;
+    day.groupId = groupId;
     
-   
     return day;
 }
-
-
-
 
 @end

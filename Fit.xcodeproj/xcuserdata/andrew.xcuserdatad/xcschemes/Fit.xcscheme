@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4ED4B7F419283674002C7E33"
-               BuildableName = "Fit.app"
+               BuildableName = "Shape.app"
                BlueprintName = "Fit"
                ReferencedContainer = "container:Fit.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4ED4B7F419283674002C7E33"
-            BuildableName = "Fit.app"
+            BuildableName = "Shape.app"
             BlueprintName = "Fit"
             ReferencedContainer = "container:Fit.xcodeproj">
          </BuildableReference>
@@ -53,7 +53,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4ED4B7F419283674002C7E33"
-            BuildableName = "Fit.app"
+            BuildableName = "Shape.app"
             BlueprintName = "Fit"
             ReferencedContainer = "container:Fit.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4ED4B7F419283674002C7E33"
-            BuildableName = "Fit.app"
+            BuildableName = "Shape.app"
             BlueprintName = "Fit"
             ReferencedContainer = "container:Fit.xcodeproj">
          </BuildableReference>

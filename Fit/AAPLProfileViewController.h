@@ -17,12 +17,16 @@
 #import "IMFURLProtocol.h"
 #import <IMFCore/IMFCore.h>
 #import <GooglePlus/GooglePlus.h>
+#import "ContainerViewController.h"
+#import "TesterViewController.h"
 
 
 @import UIKit;
 @import HealthKit;
 
 @interface AAPLProfileViewController : UIViewController <GPPSignInDelegate>
+
+
 
 // Note that the user's age is not editable.
 @property (nonatomic, weak) IBOutlet UILabel *ageUnitLabel;
@@ -47,6 +51,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *stepsPercentage;
 @property (strong, nonatomic) IBOutlet UILabel *sleepPercentage;
 @property (strong, nonatomic) IBOutlet UILabel *heartPercentage;
+@property (strong, nonatomic) IBOutlet UILabel *BMIlabel;
 
 @property NSInteger stepsYesterday;
 @property NSInteger caloriesBurnedYesterday;
@@ -56,18 +61,27 @@
 @property NSInteger weightYesterday;
 @property NSInteger ageYesterday;
 @property NSInteger sexYesterday;
+@property NSInteger groupIdYesterday;
+
+@property NSInteger physicalFitnessScoreYesterday;
 
 
 
 @property CDTStore *remotedatastore;
 
+@property (nonatomic, weak) ContainerViewController *containerViewController;
+//@property TesterViewController *testerViewController;
 
+- (IBAction)swapButtonPressed:(id)sender;
+
+- (void)swapFromViewController:(UIViewController *)fromViewController toViewController:(UIViewController *)toViewController;
 
 @property (nonatomic) HKHealthStore *healthStore;
 
-+ (AAPLProfileViewController *)sharedInstanceOfMe;
+- (Today *)sharedInstanceOfToday;
 
 - (IBAction)sendData:(id)sender;
 - (void) saveDataToDb;
+//- (void) saveDataWithInputDay:(Today*) today;
 
 @end
