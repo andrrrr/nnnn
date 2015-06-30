@@ -19,6 +19,7 @@
 #import <GooglePlus/GooglePlus.h>
 #import "ContainerViewController.h"
 #import "TesterViewController.h"
+#import "healthKit.h"
 
 
 @import UIKit;
@@ -69,6 +70,7 @@
 
 @property CDTStore *remotedatastore;
 
+
 @property (nonatomic, weak) ContainerViewController *containerViewController;
 //@property TesterViewController *testerViewController;
 
@@ -77,6 +79,7 @@
 - (void)swapFromViewController:(UIViewController *)fromViewController toViewController:(UIViewController *)toViewController;
 
 @property (nonatomic) HKHealthStore *healthStore;
+@property (nonatomic) healthKit *healthKit;
 
 - (Today *)sharedInstanceOfToday;
 

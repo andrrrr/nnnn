@@ -50,6 +50,7 @@ bool allowsAlert;
         NSSet *readDataTypes = [self dataTypesToRead];
         
         self.healthStore = [[HKHealthStore alloc] init];
+        self.healthKit = [[healthKit alloc] init];
         
         [self.healthStore requestAuthorizationToShareTypes:writeDataTypes readTypes:readDataTypes completion:^(BOOL success, NSError *error) {
             NSLog(@"---HEALTH KIT in completion block---");
@@ -59,10 +60,13 @@ bool allowsAlert;
                 return;
             }
             
+            //[self.healthKit getCaloriesBurned];
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                // Update the user interface based on the current user's health information.
-                
+        
                 [self registerObserversAndCalculateIndex];
+                
+                [self getUserCaloriesBurned];
                 
                 [self updateUsersAgeLabel];
                 [self updateUsersHeightLabel];
@@ -75,20 +79,6 @@ bool allowsAlert;
             });
         }];
     }
-    
-//    GPPSignIn *signIn = [GPPSignIn sharedInstance];
-//    signIn.shouldFetchGooglePlusUser = YES;
-//    //signIn.shouldFetchGoogleUserEmail = YES;  // Uncomment to get the user's email
-//    
-//    // You previously set kClientId in the "Initialize the Google+ client" step
-//    signIn.clientID = kClientId;
-//    
-//    // Uncomment one of these two statements for the scope you chose in the previous step
-//    //signIn.scopes = @[ kGTLAuthScopePlusLogin ];  // "https://www.googleapis.com/auth/plus.login" scope
-//    signIn.scopes = @[ @"profile" ];            // "profile" scope
-//    
-//    // Optional: declare signIn.actions, see "app activities"
-//    signIn.delegate = self;
     
     
     [self cookBluemix];
@@ -115,7 +105,7 @@ bool allowsAlert;
     if ([segue.identifier isEqualToString:@"embedContainer"]) {
         
         self.containerViewController = segue.destinationViewController;
-       // [self.testerViewController redrawGraph];
+       
     }
 }
 
@@ -125,7 +115,7 @@ bool allowsAlert;
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-//    NSLog(@"******^^^^^^^^ From KVO");
+
     
     if([keyPath isEqualToString:@"stepsYesterday"])
     {
@@ -163,9 +153,19 @@ bool allowsAlert;
         [self removeObserver:self forKeyPath:@"heartRateYesterday"];
         
     }
+    if([keyPath isEqualToString:@"caloriesBurnedYesterday"])
+    {
+        counterObservers += 1;
+        [self removeObserver:self forKeyPath:@"caloriesBurnedYesterday"];
+        
+    }
     
-    if(counterObservers == 6){[self calculateIndex]; }
+    if(counterObservers == 7){
+        [self calculateIndex];
+        
+    }
 }
+
 
 
 - (void)registerObserversAndCalculateIndex
@@ -177,6 +177,7 @@ bool allowsAlert;
     [self addObserver:self forKeyPath:@"weightYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self addObserver:self forKeyPath:@"sleepMinutesYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self addObserver:self forKeyPath:@"heartRateYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    [self addObserver:self forKeyPath:@"caloriesBurnedYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
 }
 
 
@@ -328,10 +329,14 @@ bool allowsAlert;
 
 - (void)updateUsersAgeLabel {
 
-    NSUInteger usersAge = [self.healthStore getUsersAge];
-    NSString *inStr = [NSString stringWithFormat: @"%ld years", (long)usersAge];
-    self.ageYesterday = usersAge;
-    self.ageValueLabel.text = inStr;
+    [self.healthStore getUsersAge:^(double usersAge, NSError *error) {
+        NSString *inStr = [NSString stringWithFormat: @"%ld years", (long)usersAge];
+        self.ageYesterday = usersAge;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.ageValueLabel.text = inStr;
+        });
+    }];
+    
 
 }
 
@@ -492,6 +497,17 @@ bool allowsAlert;
         NSLog(@"%s: fire time = %@", __PRETTY_FUNCTION__, notifDate);
     }
 }
+
+-(void)getUserCaloriesBurned
+{
+    [self.healthStore getUsersEnergyBurned: ^(double activeEnergyBurned, NSError *error) {
+        self.caloriesBurnedYesterday = activeEnergyBurned;
+        
+        self.caloriesBurnedYesterday = (double)activeEnergyBurned * (double)0.239005736;
+    }];
+    
+}
+
 
 
 #pragma mark - Writing HealthKit Data
@@ -663,7 +679,10 @@ typedef void(^myCompletion)(Today *today);
     
     dispatch_group_async(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
         
+        
         [self registerObserversAndCalculateIndex];
+        
+        [self getUserCaloriesBurned];
         
         [self updateUsersAgeLabel];
         [self updateUsersHeightLabel];
@@ -691,8 +710,10 @@ typedef void(^myCompletion)(Today *today);
         [components setDay:-1];
         NSDate *yesterday = [cal dateByAddingComponents:components toDate:todayDate options:0];
         
+        GPPSignIn *signIn = [GPPSignIn sharedInstance];
+        //signIn.userEmail
         
-        Today *today = [[Today alloc] initWithDate:yesterday physicalFitnessScore:self.physicalFitnessScoreYesterday userEmail:@"" steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
+        Today *today = [[Today alloc] initWithDate:yesterday physicalFitnessScore:self.physicalFitnessScoreYesterday userEmail:signIn.userEmail steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
         
         compblock(today);
     });
@@ -714,26 +735,19 @@ typedef void(^myCompletion)(Today *today);
     NSLog(@"### calculateIndex: heartRateYesterday, %ld", (long)self.heartRateYesterday);
     
     //calculate score movement
-    if (self.stepsYesterday < 3000) scoreMovement = 0;
-    else if (self.stepsYesterday >= 3000 && self.stepsYesterday < 7500) scoreMovement = 1;
-    else if (self.stepsYesterday >= 7500 && self.stepsYesterday < 10000) scoreMovement = 2;
-    else if (self.stepsYesterday >= 10000 && self.stepsYesterday < 15000) scoreMovement = 3;
-    else if (self.stepsYesterday >= 15000 && self.stepsYesterday < 17500)
-    {
-        scoreMovement = 2;
-        [self presentWarningWithText:@"You have walked more than 15000 steps today, this is too much. Slow down a bit?"];
-    }
-    else if (self.stepsYesterday >= 17500 && self.stepsYesterday < 20000)
-    {
-        scoreMovement = 1;
-        [self presentWarningWithText:@"You have walked more than 17500 steps today, this is too much. Slow down a bit?"];
-    }
-    else if (self.stepsYesterday > 20000)
-    {
-        scoreMovement = 0;
-        [self presentWarningWithText:@"You have walked more than 20000 steps today, this is too much. Slow down a bit?"];
-    }
+    double stepsFromCalories = 0;
+    stepsFromCalories = (double)self.caloriesBurnedYesterday / (double)0.04;
+    double stepsAll =self.stepsYesterday + stepsFromCalories;
+    
+    if (stepsAll < 3000) scoreMovement = 0;
+    else if (stepsAll >= 3000 && stepsAll < 7500) scoreMovement = 1;
+    else if (stepsAll >= 7500 && stepsAll < 10000) scoreMovement = 2;
+    else if (stepsAll >= 10000 && stepsAll < 15000) scoreMovement = 3;
+    else if (stepsAll >= 15000 && stepsAll < 17500) scoreMovement = 2;
+    else if (stepsAll >= 17500 && stepsAll < 20000) scoreMovement = 1;
+    else if (stepsAll > 20000) scoreMovement = 0;
 
+    
     
     //calculate score sleep
     if (self.sleepMinutesYesterday < 360 || self.sleepMinutesYesterday > 600) scoreSleep = 0;

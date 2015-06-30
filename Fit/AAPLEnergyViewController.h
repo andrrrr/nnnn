@@ -15,4 +15,6 @@
 
 @property (nonatomic) HKHealthStore *healthStore;
 
+- (void)refreshStatistics:(void(^)(double activeEnergyBurned, double restingEnergyBurned,double energyConsumed,double netEnergy))completion ;
+
 @end

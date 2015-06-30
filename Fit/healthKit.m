@@ -1,127 +1,35 @@
-/*
-     Copyright (C) 2015 IBM. All Rights Reserved.
-     See LICENSE.txt for this sample’s licensing information
- 
-    Abstract:
-    
-                Contains shared helper methods on HKHealthStore that are specific to Fit's use cases.
-            
-*/
+//
+//  healthKit.m
+//  Fit
+//
+//  Created by andrew on 29-06-15.
+//  Copyright (c) 2015 Apple. All rights reserved.
+//
 
+#import "healthKit.h"
 #import "HKHealthStore+AAPLExtensions.h"
 #import "AAPLProfileViewController.h"
+#import "AAPLEnergyViewController.h"
+#import "Today.h"
 
-@implementation HKHealthStore (AAPLExtensions)
+@implementation healthKit
+
 
 int counterObservers;
 int counterObservers2;
 
-- (void)aapl_mostRecentQuantitySampleOfType:(HKQuantityType *)quantityType predicate:(NSPredicate *)predicate completion:(void (^)(HKQuantity *, NSError *))completion {
-    NSSortDescriptor *timeSortDescriptor = [[NSSortDescriptor alloc] initWithKey:HKSampleSortIdentifierEndDate ascending:NO];
-    
-    // Since we are interested in retrieving the user's latest sample, we sort the samples in descending order, and set the limit to 1. We are not filtering the data, and so the predicate is set to nil.
-    HKSampleQuery *query = [[HKSampleQuery alloc] initWithSampleType:quantityType predicate:nil limit:1 sortDescriptors:@[timeSortDescriptor] resultsHandler:^(HKSampleQuery *query, NSArray *results, NSError *error) {
-        if (!results) {
-            if (completion) {
-                completion(nil, error);
-            }
-            return;
-        }
-        
-        if (completion) {
-            // If quantity isn't in the database, return nil in the completion block.
-            HKQuantitySample *quantitySample = results.firstObject;
-            HKQuantity *quantity = quantitySample.quantity;
-            
-            completion(quantity, error);
-        }
-    }];
-    
-    [self executeQuery:query];
-}
 
 
-- (void)hkQueryExecute:(void (^)(double, NSError *))completion {
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDate *now = [NSDate date];
-    NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:now];
-    NSDate *startDate = [calendar dateFromComponents:components];
-    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:startDate options:0];
-    
-    HKSampleType *sampleType = [HKSampleType categoryTypeForIdentifier:HKCategoryTypeIdentifierSleepAnalysis];
-    NSPredicate *predicate = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionNone];
-    
-    HKSampleQuery *query = [[HKSampleQuery alloc] initWithSampleType:sampleType predicate:predicate limit:0 sortDescriptors:nil resultsHandler:^(HKSampleQuery *query, NSArray *results, NSError *error) {
-        if (!results) {
-            NSLog(@"An error occured fetching the user's sleep duration. In your app, try to handle this gracefully. The error was: %@.", error);
-            completion(0, error);
-            abort();
-        }
-        
-        //double minutesAggr = 0;
-        for (HKCategorySample *sample in results) {
-
-            NSTimeInterval distanceBetweenDates = [sample.endDate timeIntervalSinceDate:sample.startDate];
-            double minutesInAnHour = 60;
-            double minutesBetweenDates = distanceBetweenDates / minutesInAnHour;
-            //minutesAggr += minutesBetweenDates;
-            completion(minutesBetweenDates, error);
-            
-        }
-//        completion(minutesAggr, error);
-    }];
-    
-    [self executeQuery:query];
-}
-
-- (void)fetchSumOfSamplesTodayForType:(HKQuantityType *)quantityType unit:(HKUnit *)unit completion:(void (^)(double, NSError *))completionHandler {
-    NSPredicate *predicate = [self predicateForSamplesToday];
-    
-    HKStatisticsQuery *query = [[HKStatisticsQuery alloc] initWithQuantityType:quantityType quantitySamplePredicate:predicate options:HKStatisticsOptionCumulativeSum completionHandler:^(HKStatisticsQuery *query, HKStatistics *result, NSError *error) {
-        HKQuantity *sum = [result sumQuantity];
-        
-        if (completionHandler) {
-            double value = [sum doubleValueForUnit:unit];
-            
-            completionHandler(value, error);
-        }
-    }];
-    [self executeQuery:query];
-}
-
-- (NSPredicate *)predicateForSamplesToday {
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    
-    NSDate *now = [NSDate date];
-    
-    NSDate *startDate = [calendar startOfDayForDate:now];
-    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:startDate options:0];
-    
-    return [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
-}
-
-- (void)getUsersEnergyBurned:(void (^)(double, NSError *))completion2 {
-    HKQuantityType *activeEnergyBurnType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned];
-    
-    [self fetchSumOfSamplesTodayForType:activeEnergyBurnType unit:[HKUnit jouleUnit] completion:^(double activeEnergyBurned, NSError *error) {
-        
-//        self.caloriesBurnedYesterday = (double)activeEnergyBurned * (double)0.239005736;
-//        NSLog(@"CAL : %ld", (long)self.caloriesBurnedYesterday);
-        
-        completion2(activeEnergyBurned, error);
-    }];
-}
-
-
-
-
-
+ 
 
 - (void) getUsersAge:(void (^)(double, NSError *))completion2 {
+    
+    self.healthStore = [[HKHealthStore alloc] init];
+    
     NSUInteger usersAge = 0;
     
     NSError *error;
-    NSDate *dateOfBirth = [self dateOfBirthWithError:&error];
+    NSDate *dateOfBirth = [self.healthStore dateOfBirthWithError:&error];
     
     if (!dateOfBirth) {
         NSLog(@"Either an error occured fetching the user's age information or none has been stored yet. In your app, try to handle this gracefully.");
@@ -134,7 +42,6 @@ int counterObservers2;
         NSDateComponents *ageComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:dateOfBirth toDate:now options:NSCalendarWrapComponents];
         
         usersAge = [ageComponents year];
-        
     }
     completion2(usersAge, error);
 }
@@ -145,11 +52,11 @@ int counterObservers2;
     
     HKQuantityType *heightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight];
     
-    [self aapl_mostRecentQuantitySampleOfType:heightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
+    [self.healthStore aapl_mostRecentQuantitySampleOfType:heightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
         if (!mostRecentQuantity) {
             NSLog(@"Either an error occured fetching the user's height information or none has been stored yet. In your app, try to handle this gracefully.");
             completion2(0, error);
-           
+            
         }
         else {
             // Determine the height in the required unit.
@@ -207,22 +114,39 @@ int counterObservers2;
                                            double value = [quantity doubleValueForUnit:[HKUnit countUnit]];
                                            NSLog(@"#### %@: %f", date, value);
                                            
-                                           
+                                           self.stepsYesterday = value;
                                            completion2(value, error);
+                                       }else{
+                                           self.stepsYesterday = 0;
+                                           completion2(0, error);
+
                                        }
                                    }];
     };
     
-    [self executeQuery:query];
+    [self.healthStore executeQuery:query];
     
 }
+
+
+
+//calories ======================
+//- (void)getCaloriesBurned {
+//
+//    NSLog(@"BEFORE");
+//    self.aaplController = [[AAPLEnergyViewController alloc] init];
+//    [self.aaplController refreshStatistics:^(double activeEnergyBurned, double restingEnergyBurned, double energyConsumed, double netEnergy) {
+//        NSLog(@"EVERYTHING : %f, %f, %f, %f", activeEnergyBurned, restingEnergyBurned, energyConsumed, netEnergy);
+//    }];
+//}
+//calories ======================
 
 
 - (void)getUsersWeight:(void (^)(double, NSError *))completion2 {
     
     HKQuantityType *weightType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
     
-    [self aapl_mostRecentQuantitySampleOfType:weightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
+    [self.healthStore aapl_mostRecentQuantitySampleOfType:weightType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
         if (!mostRecentQuantity) {
             NSLog(@"Either an error occured fetching the user's weight information or none has been stored yet. In your app, try to handle this gracefully.");
             completion2(0, error);
@@ -239,17 +163,17 @@ int counterObservers2;
 
 
 - (void)getUsersSleep:(void (^)(double, NSError *))completion2 {
-    [self hkQueryExecute: ^(double minutes, NSError *error) {
+    [self.healthStore hkQueryExecute: ^(double minutes, NSError *error) {
         if (minutes == 0) {
             NSLog(@"Either an error occured fetching the user's sleep information or none has been stored yet.");
-            
+            self.sleepMinutesYesterday = 0;
             completion2(0, error);
         }
         else {
             int hours = (int)(minutes / 60);
             int minutesNew = (int)minutes - (hours*60);
             NSLog(@"minutes: %f ,hours slept: %ld:%ld", minutes, (long)hours, (long)minutesNew);
-            
+            self.sleepMinutesYesterday = minutes;
             completion2(minutes, error);
         }
     }];
@@ -258,7 +182,7 @@ int counterObservers2;
 - (void)getUsersHeartRate:(void (^)(double, NSError *))completion2 {
     HKQuantityType *heartRateType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
     
-    [self aapl_mostRecentQuantitySampleOfType:heartRateType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
+    [self.healthStore aapl_mostRecentQuantitySampleOfType:heartRateType predicate:nil completion:^(HKQuantity *mostRecentQuantity, NSError *error) {
         if (!mostRecentQuantity) {
             NSLog(@"Either an error occured fetching the user's heart rate information or none has been stored yet. In your app, try to handle this gracefully.");
             completion2(0, error);
@@ -268,7 +192,7 @@ int counterObservers2;
             // Determine the weight in the required unit.
             HKUnit *heartRateUnit = [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
             double usersHR = [mostRecentQuantity doubleValueForUnit:heartRateUnit];
-
+            
             completion2(usersHR, error);
         }
     }];
@@ -278,7 +202,9 @@ int counterObservers2;
 
 
 
-- (void)calculateIndex {
+
+
+- (double)calculateIndex {
     int scoreMovement;
     int scoreSleep;
     int scoreHeartRate;
@@ -293,17 +219,13 @@ int counterObservers2;
     NSLog(@"### calculateIndex: heartRateYesterday, %ld", (long)self.heartRateYesterday);
     
     //calculate score movement
-    double stepsFromCalories = 0;
-    stepsFromCalories = (double)self.caloriesBurnedYesterday / (double)0.04;
-    double stepsAll =self.stepsYesterday + stepsFromCalories;
-    
-    if (stepsAll < 3000) scoreMovement = 0;
-    else if (stepsAll >= 3000 && stepsAll < 7500) scoreMovement = 1;
-    else if (stepsAll >= 7500 && stepsAll < 10000) scoreMovement = 2;
-    else if (stepsAll >= 10000 && stepsAll < 15000) scoreMovement = 3;
-    else if (stepsAll >= 15000 && stepsAll < 17500) scoreMovement = 2;
-    else if (stepsAll >= 17500 && stepsAll < 20000) scoreMovement = 1;
-    else if (stepsAll > 20000) scoreMovement = 0;
+    if (self.stepsYesterday < 3000) scoreMovement = 0;
+    else if (self.stepsYesterday >= 3000 && self.stepsYesterday < 7500) scoreMovement = 1;
+    else if (self.stepsYesterday >= 7500 && self.stepsYesterday < 10000) scoreMovement = 2;
+    else if (self.stepsYesterday >= 10000 && self.stepsYesterday < 15000) scoreMovement = 3;
+    else if (self.stepsYesterday >= 15000 && self.stepsYesterday < 17500) scoreMovement = 2;
+    else if (self.stepsYesterday >= 17500 && self.stepsYesterday < 20000) scoreMovement = 1;
+    else if (self.stepsYesterday > 20000) scoreMovement = 0;
     
     
     //calculate score sleep
@@ -325,35 +247,35 @@ int counterObservers2;
     physicalFitnessScore = (scoreMovement*0.55 + scoreSleep*0.2 + scoreHeartRate*0.25)*100;
     NSLog(@"physicalFitnessScore  %f", physicalFitnessScore);
     self.physicalFitnessScoreYesterday = physicalFitnessScore;
-//    return physicalFitnessScore;
+    return physicalFitnessScore;
     
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        self.indexLabel.text = [NSNumberFormatter localizedStringFromNumber:@(physicalFitnessScore) numberStyle:NSNumberFormatterDecimalStyle];
-//        
-//    });
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    //        self.indexLabel.text = [NSNumberFormatter localizedStringFromNumber:@(physicalFitnessScore) numberStyle:NSNumberFormatterDecimalStyle];
+    //
+    //    });
     
     
-//    self.BMIlabel.text = @"";
-//    double BMI = 0;
-//    if(self.heightYesterday!=0){
-//        BMI = 100*100*(double)self.weightYesterday/((double)self.heightYesterday*(double)self.heightYesterday);
-//        NSLog(@"BMI: %f", BMI);
-//    }
+    //    self.BMIlabel.text = @"";
+    //    double BMI = 0;
+    //    if(self.heightYesterday!=0){
+    //        BMI = 100*100*(double)self.weightYesterday/((double)self.heightYesterday*(double)self.heightYesterday);
+    //        NSLog(@"BMI: %f", BMI);
+    //    }
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        self.BMIlabel.text = [NSNumberFormatter localizedStringFromNumber:@(BMI) numberStyle:NSNumberFormatterNoStyle];
-//    });
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    //        self.BMIlabel.text = [NSNumberFormatter localizedStringFromNumber:@(BMI) numberStyle:NSNumberFormatterNoStyle];
+    //    });
 }
 
--(void)calculateBMI {
+-(double)calculateBMI {
     double BMI = 0;
     if(self.heightYesterday!=0){
         BMI = 100*100*(double)self.weightYesterday/((double)self.heightYesterday*(double)self.heightYesterday);
         NSLog(@"BMI: %f", BMI);
     }
     self.BMI = BMI;
-
+    return BMI;
 }
 
 
@@ -362,18 +284,20 @@ int counterObservers2;
 //typedef void(^myCompletion)(Today *today);
 
 //- (void)getYesterday:(void(^)(Today *today)) myCompletion {
-    //self.healthStore = [[HKHealthStore alloc] init];
-    
+//self.healthStore = [[HKHealthStore alloc] init];
+
 - (void)getYesterday{
     
-    dispatch_group_t group = dispatch_group_create();
+//    dispatch_group_t group = dispatch_group_create();
     
     [self registerObserversAndCalculateIndex];
     [self registerObserversForIndexAndBMI];
     
-    dispatch_group_async(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
+//    dispatch_group_async(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
         //get age
-        //self.ageYesterday = [self getUsersAge];
+        [self getUsersAge:^(double age, NSError *error) {
+            self.ageYesterday = age;
+        }];
         
         //get height
         [self getUsersHeight:^(double height, NSError *error) {
@@ -400,102 +324,100 @@ int counterObservers2;
             self.heartRateYesterday = beats;
         }];
         
-        [self getUsersEnergyBurned:^(double calories, NSError *error) {
-            self.caloriesBurnedYesterday = calories;
-        }];
-        
         NSLog(@"AAAAAAGGRGGGRGRGRG");
-//        NSLog(@"### physicalFitnessScoreYesterday, %ld", (long)self.physicalFitnessScoreYesterday);
-//        NSLog(@"### stepsYest, %ld", (long)self.stepsYesterday);
-//        NSLog(@"### ageYest, %ld", (long)self.ageYesterday);
-//        NSLog(@"### heightYesterday, %ld", (long)self.heightYesterday);
-//        NSLog(@"### weightYesterday, %ld", (long)self.weightYesterday);
-//        NSLog(@"### sleepMinutesYesterday, %ld", (long)self.sleepMinutesYesterday);
+        //        NSLog(@"### physicalFitnessScoreYesterday, %ld", (long)self.physicalFitnessScoreYesterday);
+        //        NSLog(@"### stepsYest, %ld", (long)self.stepsYesterday);
+        //        NSLog(@"### ageYest, %ld", (long)self.ageYesterday);
+        //        NSLog(@"### heightYesterday, %ld", (long)self.heightYesterday);
+        //        NSLog(@"### weightYesterday, %ld", (long)self.weightYesterday);
+        //        NSLog(@"### sleepMinutesYesterday, %ld", (long)self.sleepMinutesYesterday);
         
-    });
-    
-    
-    
-//    dispatch_group_notify(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
-    
-//        NSDate *todayDate =[NSDate date];
-//        NSCalendar *cal = [NSCalendar currentCalendar];
-//        NSDateComponents *components = [[NSDateComponents alloc] init];
-//        [components setDay:-1];
-//        NSDate *yesterday = [cal dateByAddingComponents:components toDate:todayDate options:0];
-//        
-//        Today *today = [[Today alloc] initWithDate:yesterday physicalFitnessScore:0 userEmail:@"" steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
-//        
-//        myCompletion(today);
 //    });
+    
+    
+    
+    //    dispatch_group_notify(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^ {
+    
+    //        NSDate *todayDate =[NSDate date];
+    //        NSCalendar *cal = [NSCalendar currentCalendar];
+    //        NSDateComponents *components = [[NSDateComponents alloc] init];
+    //        [components setDay:-1];
+    //        NSDate *yesterday = [cal dateByAddingComponents:components toDate:todayDate options:0];
+    //
+    //        Today *today = [[Today alloc] initWithDate:yesterday physicalFitnessScore:0 userEmail:@"" steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
+    //
+    //        myCompletion(today);
+    //    });
 }
 
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    //    NSLog(@"******^^^^^^^^ From KVO");
+//        NSLog(@"******^^^^^^^^ From KVO");
+//    NSLog(@"******^^^^^^^^ counterObservers, %d", counterObservers);
+//    NSLog(@"******^^^^^^^^ counterObservers2, %d", counterObservers2);
     
     if([keyPath isEqualToString:@"stepsYesterday"])
     {
+        NSLog(@"******^^^^^^^^ steps");
         counterObservers += 1;
         [self removeObserver:self forKeyPath:@"stepsYesterday"];
         
     }
     if([keyPath isEqualToString:@"ageYesterday"])
     {
+        NSLog(@"******^^^^^^^^ age");
         counterObservers += 1;
         [self removeObserver:self forKeyPath:@"ageYesterday"];
         
     }
     if([keyPath isEqualToString:@"heightYesterday"])
     {
+        NSLog(@"******^^^^^^^^ height");
         counterObservers += 1;
         [self removeObserver:self forKeyPath:@"heightYesterday"];
         
     }
     if([keyPath isEqualToString:@"weightYesterday"])
     {
+        NSLog(@"******^^^^^^^^ weight");
         counterObservers += 1;
         [self removeObserver:self forKeyPath:@"weightYesterday"];
         
     }
     if([keyPath isEqualToString:@"sleepMinutesYesterday"])
     {
+        NSLog(@"******^^^^^^^^ sleep");
         counterObservers += 1;
         [self removeObserver:self forKeyPath:@"sleepMinutesYesterday"];
         
     }
     if([keyPath isEqualToString:@"heartRateYesterday"])
     {
+        NSLog(@"******^^^^^^^^ heart");
         counterObservers += 1;
         [self removeObserver:self forKeyPath:@"heartRateYesterday"];
         
     }
-    if([keyPath isEqualToString:@"caloriesBurnedYesterday"])
+    if([keyPath isEqualToString:@"physicalFitnessIndex"])
     {
-        counterObservers += 1;
-        [self removeObserver:self forKeyPath:@"caloriesBurnedYesterday"];
+        NSLog(@"******^^^^^^^^ fitness");
+        counterObservers2 += 1;
+        [self removeObserver:self forKeyPath:@"physicalFitnessIndex"];
+        
+    }
+    if([keyPath isEqualToString:@"BMI"])
+    {
+        NSLog(@"******^^^^^^^^ BMI");
+        counterObservers2 += 1;
+        [self removeObserver:self forKeyPath:@"BMI"];
         
     }
     
-    
-    if([keyPath isEqualToString:@"physicalFitnessIndex"])
-    {
-        counterObservers2 += 1;
-        [self removeObserver:self forKeyPath:@"physicalFitnessIndex"];
-    }
-    
-    if([keyPath isEqualToString:@"BMI"])
-    {
-        counterObservers2 += 1;
-        [self removeObserver:self forKeyPath:@"BMI"];
-    }
-    
-    
-    
-    if(counterObservers == 7){
-        [self calculateIndex];
-        [self calculateBMI];
+    if(counterObservers == 6){
+        NSLog(@"launching bmi fp");
+        self.physicalFitnessIndex = [self calculateIndex];
+        self.BMI = [self calculateBMI];
     }
     
     if(counterObservers2 == 2){
@@ -505,9 +427,38 @@ int counterObservers2;
         [components setDay:-1];
         NSDate *yesterday = [cal dateByAddingComponents:components toDate:todayDate options:0];
         
-        Today *today = [[Today alloc] initWithDate:yesterday physicalFitnessScore:self.physicalFitnessScoreYesterday userEmail:@"" steps:self.stepsYesterday caloriesBurned:self.caloriesBurnedYesterday heartRate:self.heartRateYesterday sleepMinutes:self.sleepMinutesYesterday height:self.heightYesterday weight:self.weightYesterday age:self.ageYesterday groupId:self.groupIdYesterday];
-        NSLog(@"TODAY:::::::::: %@", today);
+//        NSString *userMail = @"aa";
+        
+//        Today *today = [[Today alloc] initWithDate:yesterday
+//                              physicalFitnessScore:(NSInteger)0
+//                                         userEmail:userMail
+//                                             steps:(NSInteger)0
+//                                    caloriesBurned:(NSInteger)0
+//                                         heartRate:(NSInteger)0
+//                                      sleepMinutes:(NSInteger)0
+//                                            height:(NSInteger)0
+//                                            weight:(NSInteger)0
+//                                               age:(NSInteger)0
+//                                           groupId:(NSInteger)0];
+        
+        
+        Today *today2 = [[Today alloc] initWithDate:yesterday
+                               physicalFitnessScore:self.physicalFitnessScoreYesterday
+                                          userEmail:@""
+                                              steps:self.stepsYesterday
+                                     caloriesBurned:self.caloriesBurnedYesterday
+                                          heartRate:self.heartRateYesterday
+                                       sleepMinutes:self.sleepMinutesYesterday
+                                             height:self.heightYesterday
+                                             weight:self.weightYesterday
+                                                age:self.ageYesterday
+                                            groupId:self.groupIdYesterday];
+        
+        
+        NSLog(@"TODAY:::::::::: %@", today2);
+        
     }
+    
 }
 
 - (void)registerObserversForIndexAndBMI
@@ -527,7 +478,8 @@ int counterObservers2;
     [self addObserver:self forKeyPath:@"weightYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self addObserver:self forKeyPath:@"sleepMinutesYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self addObserver:self forKeyPath:@"heartRateYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
-    [self addObserver:self forKeyPath:@"caloriesBurnedYesterday" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
 }
 
+
 @end
+

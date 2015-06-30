@@ -1,29 +1,21 @@
-/*
-     Copyright (C) 2015 IBM. All Rights Reserved.
-     See LICENSE.txt for this sample’s licensing information
- 
-    Abstract:
-    
-                Contains shared helper methods on HKHealthStore that are specific to Fit's use cases.
-            
-*/
+//
+//  healthKit.h
+//  Fit
+//
+//  Created by andrew on 29-06-15.
+//  Copyright (c) 2015 Apple. All rights reserved.
+//
 
+#import <Foundation/Foundation.h>
 #import <CloudantToolkit/CloudantToolkit.h>
 #import <CloudantSync.h>
 #import "Today.h"
+#import "AAPLEnergyViewController.h"
 
 @import HealthKit;
 
+@interface healthKit : NSObject
 
-
-@interface HKHealthStore (AAPLExtensions)
-
-
-- (void)aapl_mostRecentQuantitySampleOfType:(HKQuantityType *)quantityType predicate:(NSPredicate *)predicate completion:(void (^)(HKQuantity *mostRecentQuantity, NSError *error))completion;
-
-- (void)hkQueryExecute: (void (^)(double, NSError *))completion;
-
-//- (void)getYesterday:(void(^)(Today *today)) myCompletion;
 
 - (void)getYesterday;
 
@@ -33,11 +25,12 @@
 - (void)getUsersWeight:(void (^)(double, NSError *))completion2;
 - (void)getUsersSleep:(void (^)(double, NSError *))completion2;
 - (void)getUsersHeartRate:(void (^)(double, NSError *))completion2;
-- (void)getUsersEnergyBurned:(void (^)(double, NSError *))completion2;
 
+- (void)getCaloriesBurned;
 
 @property CDTStore *remotedatastore;
 @property HKHealthStore *healthStore;
+@property AAPLEnergyViewController* aaplController;
 
 
 @property NSInteger stepsYesterday;

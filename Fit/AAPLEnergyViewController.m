@@ -32,11 +32,14 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.refreshControl addTarget:self action:@selector(refreshStatistics) forControlEvents:UIControlEventValueChanged];
-    
-    [self refreshStatistics];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshStatistics) name:UIApplicationDidBecomeActiveNotification object:nil];
+//    [self.refreshControl addTarget:self action:@selector(refreshStatistics) forControlEvents:UIControlEventValueChanged];
+//    
+//    [self refreshStatistics:^(double activeEnergyBurned, double restingEnergyBurned, double energyConsumed, double netEnergy) {
+//        //NSLog(@"EVERYTHING :::::::: %f, %f, %f, %f", activeEnergyBurned, restingEnergyBurned, energyConsumed, netEnergy);
+//    }];
+//
+//    
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshStatistics) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)dealloc {
@@ -45,9 +48,9 @@
 
 #pragma mark - Reading HealthKit Data
 
-- (void)refreshStatistics {
+- (void)refreshStatistics:(void(^)(double activeEnergyBurned, double restingEnergyBurned,double energyConsumed,double netEnergy))completion2 {
     [self.refreshControl beginRefreshing];
-    
+    NSLog(@"BEGIN GETTING CALORIES");
     HKQuantityType *energyConsumedType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryEnergyConsumed];
     HKQuantityType *activeEnergyBurnType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned];
     
@@ -76,7 +79,10 @@
                     
                     self.netEnergy = self.energyConsumed - self.activeEnergyBurned - self.restingEnergyBurned;
                     
+                    completion2(self.activeEnergyBurned, self.restingEnergyBurned, self.energyConsumed, self.netEnergy);
+                    
                     [self.refreshControl endRefreshing];
+                    
                 });
             }];
         }];

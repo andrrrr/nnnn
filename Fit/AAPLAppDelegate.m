@@ -11,6 +11,9 @@
 #import "AAPLAppDelegate.h"
 #import "AAPLProfileViewController.h"
 #import <GooglePlus/GooglePlus.h>
+#import "Today.h"
+#import "healthKit.h"
+
 
 
 
@@ -25,7 +28,6 @@
 
 
 @implementation AAPLAppDelegate
-
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -96,19 +98,12 @@
     
     UITabBarController *tabBarController = navigationController.tabBarController;
     
-    
-    
-
-//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Storyboard"
-//                                                         bundle: nil];
-//    UITabBarController *tabvc = [storyboard instantiateViewControllerWithIdentifier:@"thisAndThat"];
-    
+    self.healthStore = [[HKHealthStore alloc] init];
     for (UINavigationController *navigationController in tabBarController.viewControllers) {
         
         id viewController = navigationController.topViewController;
         
         if ([viewController respondsToSelector:@selector(setHealthStore:)]) {
-            NSLog(@"0000000000000 -responds-");
             [viewController setHealthStore:self.healthStore];
         }
     }
@@ -125,9 +120,45 @@
     NSLog(@"NOTIFICATION RECEIVED");
 //    AAPLProfileViewController *classs = [AAPLProfileViewController sharedInstanceOfMe];
 //    [classs saveDataToDb];
-    
+//    [self saveDataToDb];
     [alertView show];
 }
+
+//- (void) saveDataToDb {
+//    IMFDataManager *manager = [IMFDataManager sharedInstance];
+//    [manager remoteStore:@"nndb" completionHandler:^(CDTStore *createdStore, NSError *error) {
+//        if(error){
+//            NSLog(@"Could not create remote store");
+//        }else{
+//            _remotedatastore = createdStore;
+//            NSLog(@"Successfully created store: %@", _remotedatastore.name);
+//            
+//            [_remotedatastore.mapper setDataType:@"Today" forClassName:NSStringFromClass([Today class])];
+//            
+//        }
+//    }];
+//
+//    
+//    
+//    [self getYesterday:^(Today *today) {
+//        if(today){
+//            [_remotedatastore save:today completionHandler:^(id savedObject, NSError *error) {
+//                if (error) {
+//                    NSLog(@"Error trying to save object to the cloud: %@", error);
+//                } else {
+//                    // use the result
+//                    Today *savedToday = savedObject;
+//                    NSLog(@"saved revision: %@", savedToday);
+//                }
+//            }];
+//        }
+//    }];
+//}
+
+
+
+
+
 
 
 - (void)applicationWillEnterForeground:(UIApplication *)application

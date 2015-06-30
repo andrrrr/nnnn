@@ -34,14 +34,14 @@ static NSString * const kClientId = @"528605303997-40kv5mb8qn5eog7e5klea0kcb3o3k
 - (IBAction)googleLogin:(id)sender {
     GPPSignIn *signIn = [GPPSignIn sharedInstance];
     signIn.shouldFetchGooglePlusUser = YES;
-    //signIn.shouldFetchGoogleUserEmail = YES;  // Uncomment to get the user's email
+    signIn.shouldFetchGoogleUserEmail = YES;  // Uncomment to get the user's email
     
     // You previously set kClientId in the "Initialize the Google+ client" step
     signIn.clientID = kClientId;
     
     // Uncomment one of these two statements for the scope you chose in the previous step
-    signIn.scopes = @[ kGTLAuthScopePlusLogin ];  // "https://www.googleapis.com/auth/plus.login" scope
-    //signIn.scopes = @[ @"profile" ];            // "profile" scope
+    //signIn.scopes = @[ kGTLAuthScopePlusLogin ];  // "https://www.googleapis.com/auth/plus.login" scope
+    signIn.scopes = @[ @"profile" ];            // "profile" scope
     
     // Optional: declare signIn.actions, see "app activities"
     signIn.delegate = self;

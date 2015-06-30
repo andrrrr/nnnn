@@ -31,6 +31,8 @@
 		4977D3581B1C8F1A00D1BB04 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4977D3571B1C8F1A00D1BB04 /* FBSDKCoreKit.framework */; };
 		4977D35B1B1C8F3600D1BB04 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4977D3591B1C8F3600D1BB04 /* FBSDKLoginKit.framework */; };
 		4977D35C1B1C8F3600D1BB04 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4977D35A1B1C8F3600D1BB04 /* FBSDKShareKit.framework */; };
+		498AA9FC1B41D875009B94D0 /* healthKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 498AA9FA1B41D875009B94D0 /* healthKit.h */; };
+		498AA9FD1B41D875009B94D0 /* healthKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 498AA9FB1B41D875009B94D0 /* healthKit.m */; };
 		498FBE6F1B384B580045CC73 /* ActivityViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 498FBE6D1B384B580045CC73 /* ActivityViewController.h */; };
 		498FBE701B384B580045CC73 /* ActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 498FBE6E1B384B580045CC73 /* ActivityViewController.m */; };
 		498FBE731B385C870045CC73 /* LoginViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 498FBE711B385C870045CC73 /* LoginViewController.h */; };
@@ -92,6 +94,8 @@
 		4977D3571B1C8F1A00D1BB04 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		4977D3591B1C8F3600D1BB04 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		4977D35A1B1C8F3600D1BB04 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
+		498AA9FA1B41D875009B94D0 /* healthKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = healthKit.h; sourceTree = "<group>"; };
+		498AA9FB1B41D875009B94D0 /* healthKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = healthKit.m; sourceTree = "<group>"; };
 		498FBE6D1B384B580045CC73 /* ActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityViewController.h; sourceTree = "<group>"; };
 		498FBE6E1B384B580045CC73 /* ActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityViewController.m; sourceTree = "<group>"; };
 		498FBE711B385C870045CC73 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
@@ -208,6 +212,8 @@
 				4ED4B7F819283674002C7E33 /* Supporting Files */,
 				49F26AD71B175E7000CE4948 /* Today.h */,
 				49F26AD81B175E7000CE4948 /* Today.m */,
+				498AA9FA1B41D875009B94D0 /* healthKit.h */,
+				498AA9FB1B41D875009B94D0 /* healthKit.m */,
 			);
 			path = Fit;
 			sourceTree = "<group>";
@@ -312,6 +318,7 @@
 				49F26AD91B175E7000CE4948 /* Today.h in Headers */,
 				4ED6CAC519287AE5004BAD02 /* AAPLEnergyViewController.h in Headers */,
 				498FBE731B385C870045CC73 /* LoginViewController.h in Headers */,
+				498AA9FC1B41D875009B94D0 /* healthKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,6 +449,7 @@
 				4ED6CAC619287AE5004BAD02 /* AAPLEnergyViewController.m in Sources */,
 				4ED6CABA1928708D004BAD02 /* AAPLJournalViewController.m in Sources */,
 				498FBE741B385C870045CC73 /* LoginViewController.m in Sources */,
+				498AA9FD1B41D875009B94D0 /* healthKit.m in Sources */,
 				498FBE701B384B580045CC73 /* ActivityViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
